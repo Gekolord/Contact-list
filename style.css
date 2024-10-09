@@ -1,0 +1,17 @@
+* {
+    font-family: "Roboto", sans-serif;
+}
+
+.main-title {
+    margin: auto;
+    font-size: 75px;
+}
+
+.wrapper {
+    display: flex;
+}
+
+.form-wrapper {
+    display: flex;
+    justify-content: space-evenly;
+}
