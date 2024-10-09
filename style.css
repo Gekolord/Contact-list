@@ -1,5 +1,7 @@
 * {
     font-family: "Roboto", sans-serif;
+    
+    
 }
 
 .main-title {
@@ -9,6 +11,9 @@
 
 .wrapper {
     display: flex;
+    flex-direction: column;
+    gap: 5vw;
+    
 }
 
 .form-wrapper {
@@ -18,4 +23,17 @@
 
 .contact-table {
     display: flex;
+    margin: auto;
+    gap: 5vw;
+}
+
+.column__element {
+    width: 20vw;
+    min-width: 200px;
+    font-size:calc(16px + 1vw);
+    background-color: red;
+}
+
+.form__element {
+    font-size:calc(12px + 0.5vw);
 }
