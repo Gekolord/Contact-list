@@ -37,3 +37,7 @@
 .form__element {
     font-size:calc(12px + 0.5vw);
 }
+
+.column__element-data-info {
+    display: none;
+}
