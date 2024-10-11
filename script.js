@@ -4,7 +4,13 @@ let allContacts = {
             "name": "anatoly",
             "vacancy": "dev",
             "phone": "+523852375"
+        },
+        {
+            "name": "nikola",
+            "vacancy": "chat",
+            "phone": "+88005553535"
         }
+        
     ],
     "b": [],
     "c": [],
@@ -44,8 +50,17 @@ function showContacts(event) {
     if (!div.classList.contains("element__letter")) return;
     let p = document.createElement('p');
     let letter = div.dataset.id
-    p.innerText = `${letter}`
-    div.append(p)
+    
+    allContacts[letter].forEach(element => {
+        let newDiv = document.createElement('div')
+        newDiv.append(`Name: ${element.name}\n`)
+        newDiv.append(`Vacancy: ${element.vacancy}\n`)
+        newDiv.append(`Phone: ${element.phone}\n\n`)
+        div.append(newDiv)
+    });
+
+    // console.log(letter)
+    
 }
 
 contactTable.addEventListener("click", showContacts)
