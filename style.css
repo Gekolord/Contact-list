@@ -39,5 +39,9 @@
 }
 
 .column__element-data-info {
-    /* display: none; */
+    display: none;
+}
+
+.column__element-data-info-shown {
+    display: block;
 }

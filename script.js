@@ -61,7 +61,7 @@ function addPersonToContacts() {
     allContacts[nameInput.value[0].toLowerCase()].push(person)
     existingContacts.add(person.name)
     console.log(allContacts)
-    return person.name[0].toLowerCase()
+    // return person.name[0].toLowerCase()
 }
 
 
@@ -73,37 +73,43 @@ function createDiv(className) {
     return div;
 }
 // adds inner text to existing div
-function renderContact(div, key, index) {
-    div.innerText = `Name: ${allContacts[key][index].name}\n
-                     Vacancy:${allContacts[key][index].vacancy}\n
-                     Phone: ${allContacts[key][index].phone}\n`
+function renderContact(div, object) {
+    div.innerText = `Name: ${object.name}
+                     Vacancy:${object.vacancy}
+                     Phone: ${object.phone}`
+}
+
+// renders all contacts of corresponding letter
+function renderColumn(char) {
+    const column = document.querySelector(`[data-id="${char.toLowerCase()}"]`)
+    column.innerHTML = char.toUpperCase()
+    allContacts[char.toLowerCase()].forEach((obj) => {
+        const newDiv = createDiv("column__element-data-info");
+        renderContact(newDiv, obj)
+        column.append(newDiv)
+    })
 }
 
 
-
-addButton.addEventListener("click", addPersonToContacts)
-
-function showContacts(event) {
+function toggleContacts(event) {
     
-    let div = event.target.closest("div");
-    if (!div) return;
-    if (!div.classList.contains("element__letter")) return;
-    let p = document.createElement('p');
-    let letter = div.dataset.id
-    
-    allContacts[letter].forEach(element => {
-        let newDiv = document.createElement('div')
-        newDiv.append(`Name: ${element.name}\n`)
-        newDiv.append(`Vacancy: ${element.vacancy}\n`)
-        newDiv.append(`Phone: ${element.phone}\n\n`)
-        div.append(newDiv)
-    });
-
-    // console.log(letter)
-    
+    let column = event.target.closest("div");
+    if (!column) return;
+    if (!column.classList.contains("element__letter")) return;
+    let displayedContacts = column.children
+    for (contact of displayedContacts) {
+        contact.classList.toggle("column__element-data-info-shown")
+    }
 }
 
-// contactTable.addEventListener("click", addPeopleToPage)
+
+addButton.addEventListener("click", function(eve) {
+    addPersonToContacts();
+    renderColumn(nameInput.value[0].toLowerCase())
+})
+
+
+contactTable.addEventListener("click", toggleContacts)
 
 // column__element-data-info
 // column__element-data-info_active
