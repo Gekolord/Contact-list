@@ -40,8 +40,15 @@
 
 .column__element-data-info {
     display: none;
+    position: relative;
 }
 
 .column__element-data-info-shown {
     display: block;
+}
+
+.column__element__remove-button {
+    position: absolute;
+    top: 40%;
+    left: 85%;
 }

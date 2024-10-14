@@ -4,13 +4,7 @@ let allContacts = {
             "name": "anatoly",
             "vacancy": "dev",
             "phone": "+523852375"
-        },
-        {
-            "name": "nikola",
-            "vacancy": "chat",
-            "phone": "+88005553535"
         }
-        
     ],
     "b": [],
     "c": [],
@@ -24,7 +18,13 @@ let allContacts = {
     "k": [],
     "l": [],
     "m": [],
-    "n": [],
+    "n": [
+        {
+            "name": "nikola",
+            "vacancy": "chat",
+            "phone": "+88005553535"
+        }
+    ],
     "o": [],
     "p": [],
     "q": [],
@@ -38,7 +38,6 @@ let allContacts = {
     "y": [],
     "z": []
 }
-
 let contactTable = document.querySelector(".contact-table")
 let nameInput = document.querySelector(".form__element-name")
 let vacancyInput = document.querySelector(".form__element-vacancy")
@@ -85,9 +84,21 @@ function renderColumn(char) {
     column.innerHTML = char.toUpperCase()
     allContacts[char.toLowerCase()].forEach((obj) => {
         const newDiv = createDiv("column__element-data-info");
+        const removeButton = renderButton("column__element__remove-button", '\u2716')
+        removeButton.addEventListener('click', (eve) => {
+            deleteItemFromAllContats(allContacts[char.toLowerCase()], obj.name, "name")
+        })
         renderContact(newDiv, obj)
+        newDiv.append(removeButton)
         column.append(newDiv)
     })
+}
+
+// deletes item from array using filter and replaces old array with new array
+function deleteItemFromAllContats(arr, prop, removeBy) {
+    newArr = arr.filter(item => item[removeBy] != prop)
+    allContacts[prop[0].toLowerCase()] = newArr
+    renderColumn(prop[0].toLowerCase())
 }
 
 
@@ -111,6 +122,16 @@ addButton.addEventListener("click", function(eve) {
 
 contactTable.addEventListener("click", toggleContacts)
 
-// column__element-data-info
-// column__element-data-info_active
+
+window.addEventListener('load', function(event) {
+    renderColumn("a")
+    renderColumn("n")
+})
+
+function renderButton(className, text) {
+    const button = document.createElement('button')
+    button.classList.add(className)
+    button.innerText = text
+    return button;
+}
 
