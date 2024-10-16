@@ -43,7 +43,14 @@ let nameInput = document.querySelector(".form__element-name")
 let vacancyInput = document.querySelector(".form__element-vacancy")
 let phoneInput = document.querySelector(".form__element-phone")
 let addButton = document.querySelector(".form__element-add")
+let nameErrorNode = document.querySelector(".error-message__name-error")
+let vacancyErrorNode = document.querySelector(".error-message__vacancy-error")
+let phoneErrorNode = document.querySelector(".error-message__phone-error")
+let nameTimer ;
+let phoneTimer;
+let vacancyTimer;
 let existingContacts = new Set();
+
 
 // adds person to contacts and returns first letter of their name
 function addPersonToContacts() {
@@ -52,7 +59,7 @@ function addPersonToContacts() {
         ['vacancy', reduceSpaces(vacancyInput.value.trim())],
         ['phone', reduceSpaces(phoneInput.value.trim())]
     ])
-    if (existingContacts.has(person.name)) {
+    if (checkExistingNames(person.name)) {
         person = null
         return true;
     }
@@ -63,7 +70,12 @@ function addPersonToContacts() {
     // return person.name[0].toLowerCase()
 }
 
-
+function checkExistingNames(str) {
+    if (!checkForEmpty(str)) {
+        return existingContacts.has(str)
+    }
+    return true
+}
 
 // Create a div with a class
 function createDiv(className) {
@@ -116,7 +128,10 @@ function toggleContacts(event) {
 
 
 addButton.addEventListener("click", function(eve) {
-    if (!addPersonToContacts()) {
+    if (validateAllInputsAndRenderErrors()) {
+        return false;
+    } else if (!checkExistingNames(nameInput.value)) {
+        addPersonToContacts()
         renderColumn(reduceSpaces(nameInput.value.trim())[0].toLowerCase())
     }
 })
@@ -190,8 +205,107 @@ function checkPhoneNumber(str) {
 
 // checks name or vacancy for all mistakes, returns true if theres any
 function checkNameOrVacancy(str) {
-    return checkForEmpty(NameOrVacancy) || 
-           checkForNonEnglishLetters(NameOrVacancy) || 
-           checkLongLength(NameOrVacancy, 15) || 
-           checkShortLength(NameOrVacancy, 3);
+    return checkForEmpty(str) || 
+           checkForNonEnglishLetters(str) || 
+           checkLongLength(str, 15) || 
+           checkShortLength(str, 3);
+}
+// displays errorMessage within targetNode for 6 seconds 
+// if error is displayed while its clicked, removes the class, cancels animation and adds class immediatly
+function displayError(targetNode, errorMessage, timerVariable) {
+    if (targetNode.classList.contains("error-message_visible")) {
+        targetNode.innerText = errorMessage;
+        targetNode.classList.toggle("error-message_visible")
+        void targetNode.offsetWidth;
+        targetNode.classList.toggle("error-message_visible")
+        clearTimeout(timerVariable);
+        timerVariable = setTimeout(() => {
+            targetNode.classList.toggle("error-message_visible")
+        }, 5500);
+    } else {
+        targetNode.innerText = errorMessage;
+        targetNode.classList.toggle("error-message_visible")
+        timerVariable = setTimeout(() => {
+            targetNode.classList.toggle("error-message_visible")
+        }, 5500);
+    }
+}
+// checks if name input has errors and renders necessary error message
+function validateNameInputAndRenderErrors() {
+    let str = nameInput.value
+    if (checkNameOrVacancy(str)) {
+        if (checkForEmpty(str)) {
+            displayError(nameErrorNode, "Must not contain empty string.", nameTimer)
+            return true;
+        } else if (checkForNonEnglishLetters(str)) {
+            displayError(nameErrorNode, "Must contain only letters from English alphabet.", nameTimer)
+            return true
+        } else if (checkLongLength(str, 15)) {
+            displayError(nameErrorNode, "Must not be longer than 15 symbols.", nameTimer)
+            return true
+        } else if (checkShortLength(str, 3)) {
+            displayError(nameErrorNode, "Must not be shorter than 3 symbols.", nameTimer)
+            return true
+        }
+    }
+    return false;
+}
+
+// checks if vacancy input has errors and renders necessary error message
+function validateVacancyInputAndRenderErrors() {
+    let str = vacancyInput.value
+    if (checkNameOrVacancy(str)) {
+        if (checkForEmpty(str)) {
+            displayError(vacancyErrorNode, "Must not contain empty string.", vacancyTimer)
+            return true;
+        } else if (checkForNonEnglishLetters(str)) {
+            displayError(vacancyErrorNode, "Must contain only letters from English alphabet.", vacancyTimer)
+            return true
+        } else if (checkLongLength(str, 15)) {
+            displayError(vacancyErrorNode, "Must not be longer than 15 symbols.", vacancyTimer)
+            return true
+        } else if (checkShortLength(str, 3)) {
+            displayError(vacancyErrorNode, "Must not be shorter than 3 symbols.", vacancyTimer)
+            return true
+        }
+    }
+    return false;
+}
+
+// checks if phone input has errors and renders necessary error message
+function validatePhoneInputAndRenderErrors() {
+    let str = phoneInput.value
+    if (checkPhoneNumber(str)) {
+        if (checkForEmpty(str)) {
+            displayError(phoneErrorNode, "Must not contain empty string.", phoneTimer)
+            return true;
+        } else if (checkIfDoesntStartsWithPlus(str)) {
+            displayError(phoneErrorNode, "Must start with plus.", phoneTimer)
+            return true;
+        } else if (checkForNonNumeric(str)) {
+            displayError(phoneErrorNode, "Must contain only numbers and no spaces.", phoneTimer)
+            return true;
+        } else if (checkShortLength(str, 5)) {
+            displayError(phoneErrorNode, "Must not be shorter than 5 symbols.", phoneTimer)
+            return true;
+        } else if (checkLongLength(str, 18)) {
+            displayError(phoneErrorNode, "Must not be longer that 18 symbols.", phoneTimer)
+            return true;
+        }
+    }
+    return false;
+}
+
+// checks if all inputs have errors and renders necessary error messages
+function validateAllInputsAndRenderErrors() {
+    if (validateNameInputAndRenderErrors() ||
+        validatePhoneInputAndRenderErrors() ||
+        validateVacancyInputAndRenderErrors()) 
+        {
+            validateNameInputAndRenderErrors() 
+            validatePhoneInputAndRenderErrors() 
+            validateVacancyInputAndRenderErrors()
+            return true
+        }
+    return false;
 }
