@@ -14,17 +14,28 @@
         <h1 class="main-title">Contact List</h1>
         
         <div class="form-wrapper">
-            <input type="text" id="name" placeholder="Name" class="form__element form__element-name">
-            <label for="name">
-                <span class="error-message">sasasasa</span>
-            </label>
-            <input type="text" id="vacancy" placeholder="Vacancy" class="form__element form__element-vacancy">
-            <input type="text" id="phone" placeholder="Phone +X XXX XXX XX XX" class="form__element form__element-phone">
-            <input type="submit" id="add" value="ADD" class="form__element form__element-add">
-            <input type="submit" id="clear-list" value="Clear List" class="form__element">
-            <input type="submit" id="search" value="Search" class="form__element">
+            <div class="text-field-wrapper input-name-wrapper">
+                <input type="text" id="name" placeholder="Name" class="form__element form__element-name">
+                <span class="error-message error-message__name-error"></span>
+            </div>
+            <div class="text-field-wrapper input-vacancy-wrapper">
+                <input type="text" id="vacancy" placeholder="Vacancy" class="form__element form__element-vacancy">
+                <span class="error-message error-message__vacancy-error">message</span>
+            </div>
+            <div class="text-field-wrapper input-phone-wrapper">
+                <input type="text" id="phone" placeholder="Phone +X XXX XXX XX XX" class="form__element form__element-phone">
+                <span class="error-message error-message__phone-error">values asdsa sasdasda sasad uld o</span>
+            </div>
+            <div class="button-wrapper add-button-wrapper">
+                <input type="submit" id="add" value="ADD" class="form__element form__element-add">
+            </div>
+            <div class="button-wrapper clear-list-button-wrapper">
+                <input type="submit" id="clear-list" value="Clear List" class="form__element">
+            </div>
+            <div class="button-wrapper search-button-wrapper">
+                <input type="submit" id="search" value="Search" class="form__element">
+            </div>
         </div>
-        <div class="error-holder"></div>
         <div class="contact-table">            
             <div class="contact-table__column column">
                     <div class="column__element element"><div data-id="a" class="element__letter js-column-letter">A</div></div>

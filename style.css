@@ -53,6 +53,50 @@
     left: 85%;
 }
 
-.error-holder {
-    height: 30px;
+.text-field-wrapper {
+    
+    display: flex;
+    flex-direction: column;
+}
+
+.error-message {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    white-space: normal;
+    text-align: center;
+    max-width: 250px;
+    color: rgb(37, 37, 37);
+    background-color: rgb(255, 95, 95);
+    border-radius: 3px;
+    border: 2px solid black;
+    height: 2.5em;
+    animation: fadeIn 1s;
+    animation-fill-mode: forwards;
+    /* visibility: hidden; */
+}
+
+.error-message_visible{ 
+    animation: fadeIn 1s;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        visibility: visible;
+        opacity: 1;
+    }
+        
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+        visibility: hidden;
+    }
 }
