@@ -46,12 +46,12 @@ let addButton = document.querySelector(".form__element-add")
 let nameErrorNode = document.querySelector(".error-message__name-error")
 let vacancyErrorNode = document.querySelector(".error-message__vacancy-error")
 let phoneErrorNode = document.querySelector(".error-message__phone-error")
-let nameTimer ;
-let phoneTimer;
-let vacancyTimer;
+const timers = {
+    nameTimer: undefined,
+    vacancyTimer: undefined,
+    phoneTimer: undefined
+};
 let existingContacts = new Set();
-
-
 // adds person to contacts and returns first letter of their name
 function addPersonToContacts() {
     let person = Object.fromEntries([
@@ -59,18 +59,23 @@ function addPersonToContacts() {
         ['vacancy', reduceSpaces(vacancyInput.value.trim())],
         ['phone', reduceSpaces(phoneInput.value.trim())]
     ])
-    if (checkExistingNames(person.name)) {
+    if (checkExistingContact(reduceSpaces(`${person.name}${person.vacancy}${person.phone}`))) {
+
         person = null
         return true;
     }
 
     allContacts[reduceSpaces(nameInput.value.trim())[0].toLowerCase()].push(person)
-    existingContacts.add(person.name)
-    console.log(allContacts)
+    existingContacts.add(reduceSpaces(`${person.name}${person.vacancy}${person.phone}`))
     // return person.name[0].toLowerCase()
 }
 
-function checkExistingNames(str) {
+// reduces more than one consecutive spaces in a string to just one and returns it
+function reduceSpaces(str) {
+    return str.replace(/\s+/g, ' ').trim();
+}
+
+function checkExistingContact(str) {
     if (!checkForEmpty(str)) {
         return existingContacts.has(str)
     }
@@ -98,7 +103,7 @@ function renderColumn(char) {
         const newDiv = createDiv("column__element-data-info");
         const removeButton = renderButton("column__element__remove-button", '\u2716')
         removeButton.addEventListener('click', (eve) => {
-            deleteItemFromAllContats(allContacts[char.toLowerCase()], obj.name, "name")
+            deleteItemFromAllContats(allContacts[char.toLowerCase()], obj.name, "name", `${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`)
         })
         renderContact(newDiv, obj)
         newDiv.append(removeButton)
@@ -107,10 +112,10 @@ function renderColumn(char) {
 }
 
 // deletes item from array using filter and replaces old array with new array
-function deleteItemFromAllContats(arr, prop, removeBy) {
+function deleteItemFromAllContats(arr, prop, removeBy, setValue) {
     newArr = arr.filter(item => item[removeBy] != prop)
     allContacts[prop[0].toLowerCase()] = newArr
-    existingContacts.delete(prop)
+    existingContacts.delete(setValue)
     renderColumn(prop[0].toLowerCase())
 }
 
@@ -130,8 +135,10 @@ function toggleContacts(event) {
 addButton.addEventListener("click", function(eve) {
     if (validateAllInputsAndRenderErrors()) {
         return false;
-    } else if (!checkExistingNames(nameInput.value)) {
+    } else if (!checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`))) {
         addPersonToContacts()
+        console.log(allContacts)
+        console.log(existingContacts)
         renderColumn(reduceSpaces(nameInput.value.trim())[0].toLowerCase())
     }
 })
@@ -151,10 +158,7 @@ function renderButton(className, text) {
     button.innerText = text
     return button;
 }
-// reduces more than one consecutive spaces in a string to just one and returns it
-function reduceSpaces(str) {
-    return str.replace(/\s+/g, ' ').trim();
-}
+
 
 // returns true if a string contains non english letters, excluding spaces
 function checkForNonEnglishLetters(str) {
@@ -188,6 +192,7 @@ function checkForNonNumeric(str) {
     return !containsNonNumeric.test(str.trim());
 }
 
+
 // return true if str has spaces inside of it
 // function checkForSpaces(str) {
 //     const containsSpaces = /\s/;
@@ -200,7 +205,8 @@ function checkPhoneNumber(str) {
            checkIfDoesntStartsWithPlus(str) ||
            checkForNonNumeric(str) || 
            checkShortLength(str, 5) || 
-           checkLongLength(str, 18);
+           checkLongLength(str, 18) ||
+           checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`));
 }
 
 // checks name or vacancy for all mistakes, returns true if theres any
@@ -208,26 +214,29 @@ function checkNameOrVacancy(str) {
     return checkForEmpty(str) || 
            checkForNonEnglishLetters(str) || 
            checkLongLength(str, 15) || 
-           checkShortLength(str, 3);
+           checkShortLength(str, 3) ||
+           checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`));
 }
 // displays errorMessage within targetNode for 6 seconds 
 // if error is displayed while its clicked, removes the class, cancels animation and adds class immediatly
 function displayError(targetNode, errorMessage, timerVariable) {
     if (targetNode.classList.contains("error-message_visible")) {
         targetNode.innerText = errorMessage;
-        targetNode.classList.toggle("error-message_visible")
+        targetNode.classList.remove("error-message_visible")
         void targetNode.offsetWidth;
-        targetNode.classList.toggle("error-message_visible")
-        clearTimeout(timerVariable);
-        timerVariable = setTimeout(() => {
-            targetNode.classList.toggle("error-message_visible")
+        targetNode.classList.add("error-message_visible")
+        clearTimeout(timers[timerVariable]);
+        timers[timerVariable] = setTimeout(() => {
+            targetNode.classList.remove("error-message_visible")
         }, 5500);
+        
     } else {
         targetNode.innerText = errorMessage;
-        targetNode.classList.toggle("error-message_visible")
-        timerVariable = setTimeout(() => {
-            targetNode.classList.toggle("error-message_visible")
+        targetNode.classList.add("error-message_visible")
+        timers[timerVariable] = setTimeout(() => {
+            targetNode.classList.remove("error-message_visible")
         }, 5500);
+        
     }
 }
 // checks if name input has errors and renders necessary error message
@@ -235,16 +244,19 @@ function validateNameInputAndRenderErrors() {
     let str = nameInput.value
     if (checkNameOrVacancy(str)) {
         if (checkForEmpty(str)) {
-            displayError(nameErrorNode, "Must not contain empty string.", nameTimer)
+            displayError(nameErrorNode, "Must not contain empty string.", "nameTimer")
             return true;
         } else if (checkForNonEnglishLetters(str)) {
-            displayError(nameErrorNode, "Must contain only letters from English alphabet.", nameTimer)
+            displayError(nameErrorNode, "Must contain only letters from English alphabet.", "nameTimer")
             return true
         } else if (checkLongLength(str, 15)) {
-            displayError(nameErrorNode, "Must not be longer than 15 symbols.", nameTimer)
+            displayError(nameErrorNode, "Must not be longer than 15 symbols.", "nameTimer")
             return true
         } else if (checkShortLength(str, 3)) {
-            displayError(nameErrorNode, "Must not be shorter than 3 symbols.", nameTimer)
+            displayError(nameErrorNode, "Must not be shorter than 3 symbols.", "nameTimer")
+            return true
+        } else if (checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`))) {
+            displayError(nameErrorNode, "Cannot add existing contact", "nameTimer")
             return true
         }
     }
@@ -256,16 +268,19 @@ function validateVacancyInputAndRenderErrors() {
     let str = vacancyInput.value
     if (checkNameOrVacancy(str)) {
         if (checkForEmpty(str)) {
-            displayError(vacancyErrorNode, "Must not contain empty string.", vacancyTimer)
+            displayError(vacancyErrorNode, "Must not contain empty string.", "vacancyTimer")
             return true;
         } else if (checkForNonEnglishLetters(str)) {
-            displayError(vacancyErrorNode, "Must contain only letters from English alphabet.", vacancyTimer)
+            displayError(vacancyErrorNode, "Must contain only letters from English alphabet.", "vacancyTimer")
             return true
         } else if (checkLongLength(str, 15)) {
-            displayError(vacancyErrorNode, "Must not be longer than 15 symbols.", vacancyTimer)
+            displayError(vacancyErrorNode, "Must not be longer than 15 symbols.", "vacancyTimer")
             return true
         } else if (checkShortLength(str, 3)) {
-            displayError(vacancyErrorNode, "Must not be shorter than 3 symbols.", vacancyTimer)
+            displayError(vacancyErrorNode, "Must not be shorter than 3 symbols.", "vacancyTimer")
+            return true
+        } else if (checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`))) {
+            displayError(vacancyErrorNode, "Cannot add existing contact", "vacancyTimer")
             return true
         }
     }
@@ -277,19 +292,22 @@ function validatePhoneInputAndRenderErrors() {
     let str = phoneInput.value
     if (checkPhoneNumber(str)) {
         if (checkForEmpty(str)) {
-            displayError(phoneErrorNode, "Must not contain empty string.", phoneTimer)
+            displayError(phoneErrorNode, "Must not contain empty string.", "phoneTimer")
             return true;
         } else if (checkIfDoesntStartsWithPlus(str)) {
-            displayError(phoneErrorNode, "Must start with plus.", phoneTimer)
+            displayError(phoneErrorNode, "Must start with plus.", "phoneTimer")
             return true;
         } else if (checkForNonNumeric(str)) {
-            displayError(phoneErrorNode, "Must contain only numbers and no spaces.", phoneTimer)
+            displayError(phoneErrorNode, "Must contain only numbers and no spaces.", "phoneTimer")
             return true;
         } else if (checkShortLength(str, 5)) {
-            displayError(phoneErrorNode, "Must not be shorter than 5 symbols.", phoneTimer)
+            displayError(phoneErrorNode, "Must not be shorter than 5 symbols.", "phoneTimer")
             return true;
         } else if (checkLongLength(str, 18)) {
-            displayError(phoneErrorNode, "Must not be longer that 18 symbols.", phoneTimer)
+            displayError(phoneErrorNode, "Must not be longer that 18 symbols.", "phoneTimer")
+            return true;
+        } else if (checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`))) {
+            displayError(phoneErrorNode, "Cannot add existing contact", "phoneTimer")
             return true;
         }
     }
@@ -300,7 +318,8 @@ function validatePhoneInputAndRenderErrors() {
 function validateAllInputsAndRenderErrors() {
     if (validateNameInputAndRenderErrors() ||
         validatePhoneInputAndRenderErrors() ||
-        validateVacancyInputAndRenderErrors()) 
+        validateVacancyInputAndRenderErrors() ||
+        checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`))) 
         {
             validateNameInputAndRenderErrors() 
             validatePhoneInputAndRenderErrors() 
