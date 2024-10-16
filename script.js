@@ -48,16 +48,16 @@ let existingContacts = new Set();
 // adds person to contacts and returns first letter of their name
 function addPersonToContacts() {
     let person = Object.fromEntries([
-        ['name', nameInput.value],
-        ['vacancy', vacancyInput.value],
-        ['phone', phoneInput.value]
+        ['name', reduceSpaces(nameInput.value.trim())],
+        ['vacancy', reduceSpaces(vacancyInput.value.trim())],
+        ['phone', reduceSpaces(phoneInput.value.trim())]
     ])
     if (existingContacts.has(person.name)) {
         person = null
-        return;
+        return true;
     }
 
-    allContacts[nameInput.value[0].toLowerCase()].push(person)
+    allContacts[reduceSpaces(nameInput.value.trim())[0].toLowerCase()].push(person)
     existingContacts.add(person.name)
     console.log(allContacts)
     // return person.name[0].toLowerCase()
@@ -98,6 +98,7 @@ function renderColumn(char) {
 function deleteItemFromAllContats(arr, prop, removeBy) {
     newArr = arr.filter(item => item[removeBy] != prop)
     allContacts[prop[0].toLowerCase()] = newArr
+    existingContacts.delete(prop)
     renderColumn(prop[0].toLowerCase())
 }
 
@@ -115,8 +116,9 @@ function toggleContacts(event) {
 
 
 addButton.addEventListener("click", function(eve) {
-    addPersonToContacts();
-    renderColumn(nameInput.value[0].toLowerCase())
+    if (!addPersonToContacts()) {
+        renderColumn(reduceSpaces(nameInput.value.trim())[0].toLowerCase())
+    }
 })
 
 
@@ -134,4 +136,62 @@ function renderButton(className, text) {
     button.innerText = text
     return button;
 }
+// reduces more than one consecutive spaces in a string to just one and returns it
+function reduceSpaces(str) {
+    return str.replace(/\s+/g, ' ').trim();
+}
 
+// returns true if a string contains non english letters, excluding spaces
+function checkForNonEnglishLetters(str) {
+    const nonEnglishPattern = /[^a-zA-Z\s]/;
+    return nonEnglishPattern.test(str);
+}
+// return true if str is shorter than num symbols
+function checkShortLength(str, num) {
+    return reduceSpaces(str.trim()).length < num
+}
+
+// return true if str is longer than num symbols
+function checkLongLength(str, num) {
+    return reduceSpaces(str.trim()).length > num
+}
+
+// return true if str is empty
+function checkForEmpty(str) {
+    return !str.trim()
+}
+
+// return true if str doesnt start with +
+function checkIfDoesntStartsWithPlus(str) {
+    const startsWithPlus = /^\+/;
+    return !startsWithPlus.test(str.trim())
+}
+
+// return true if str contains non numeric chars or spaces inside of it, but allows + at the beginning
+function checkForNonNumeric(str) {
+    const containsNonNumeric = /^\+?[\d]*$/;
+    return !containsNonNumeric.test(str.trim());
+}
+
+// return true if str has spaces inside of it
+// function checkForSpaces(str) {
+//     const containsSpaces = /\s/;
+//     return containsSpaces.test(str.trim())
+// }
+
+// checks phone number for all mistakes, returns true if theres any
+function checkPhoneNumber(str) {
+    return checkForEmpty(str) || 
+           checkIfDoesntStartsWithPlus(str) ||
+           checkForNonNumeric(str) || 
+           checkShortLength(str, 5) || 
+           checkLongLength(str, 18);
+}
+
+// checks name or vacancy for all mistakes, returns true if theres any
+function checkNameOrVacancy(str) {
+    return checkForEmpty(NameOrVacancy) || 
+           checkForNonEnglishLetters(NameOrVacancy) || 
+           checkLongLength(NameOrVacancy, 15) || 
+           checkShortLength(NameOrVacancy, 3);
+}

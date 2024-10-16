@@ -12,7 +12,7 @@
 .wrapper {
     display: flex;
     flex-direction: column;
-    gap: 5vw;
+    gap: 20px;
     
 }
 
@@ -51,4 +51,8 @@
     position: absolute;
     top: 40%;
     left: 85%;
+}
+
+.error-holder {
+    height: 30px;
 }
