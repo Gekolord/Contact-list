@@ -1,11 +1,5 @@
 let allContacts = {
-    "a": [
-        {
-            "name": "anatoly",
-            "vacancy": "dev",
-            "phone": "+523852375"
-        }
-    ],
+    "a": [],
     "b": [],
     "c": [],
     "d": [],
@@ -18,13 +12,7 @@ let allContacts = {
     "k": [],
     "l": [],
     "m": [],
-    "n": [
-        {
-            "name": "nikola",
-            "vacancy": "chat",
-            "phone": "+88005553535"
-        }
-    ],
+    "n": [],
     "o": [],
     "p": [],
     "q": [],
@@ -103,7 +91,7 @@ function renderColumn(char) {
         const newDiv = createDiv("column__element-data-info");
         const removeButton = renderButton("column__element__remove-button", '\u2716')
         removeButton.addEventListener('click', (eve) => {
-            deleteItemFromAllContats(allContacts[char.toLowerCase()], obj.name, "name", `${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`)
+            deleteItemFromAllContats(allContacts[char.toLowerCase()], obj.name, obj.vacancy, obj.phone, "name", "vacancy", "phone",`${reduceSpaces(obj.name)}${reduceSpaces(obj.vacancy)}${reduceSpaces(obj.phone)}`)
         })
         renderContact(newDiv, obj)
         newDiv.append(removeButton)
@@ -112,11 +100,11 @@ function renderColumn(char) {
 }
 
 // deletes item from array using filter and replaces old array with new array
-function deleteItemFromAllContats(arr, prop, removeBy, setValue) {
-    newArr = arr.filter(item => item[removeBy] != prop)
-    allContacts[prop[0].toLowerCase()] = newArr
+function deleteItemFromAllContats(arr, prop1, prop2, prop3, removeBy1, removeBy2, removeBy3, setValue) {
+    newArr = arr.filter(item => !(item[removeBy1] === prop1 && item[removeBy2] === prop2 && item[removeBy3] === prop3))
+    allContacts[prop1[0].toLowerCase()] = newArr
     existingContacts.delete(setValue)
-    renderColumn(prop[0].toLowerCase())
+    renderColumn(prop1[0].toLowerCase())
 }
 
 
@@ -147,10 +135,10 @@ addButton.addEventListener("click", function(eve) {
 contactTable.addEventListener("click", toggleContacts)
 
 
-window.addEventListener('load', function(event) {
-    renderColumn("a")
-    renderColumn("n")
-})
+// window.addEventListener('load', function(event) {
+//     renderColumn("a")
+//     renderColumn("n")
+// })
 
 function renderButton(className, text) {
     const button = document.createElement('button')
@@ -191,13 +179,6 @@ function checkForNonNumeric(str) {
     const containsNonNumeric = /^\+?[\d]*$/;
     return !containsNonNumeric.test(str.trim());
 }
-
-
-// return true if str has spaces inside of it
-// function checkForSpaces(str) {
-//     const containsSpaces = /\s/;
-//     return containsSpaces.test(str.trim())
-// }
 
 // checks phone number for all mistakes, returns true if theres any
 function checkPhoneNumber(str) {
@@ -298,7 +279,7 @@ function validatePhoneInputAndRenderErrors() {
             displayError(phoneErrorNode, "Must start with plus.", "phoneTimer")
             return true;
         } else if (checkForNonNumeric(str)) {
-            displayError(phoneErrorNode, "Must contain only numbers and no spaces.", "phoneTimer")
+            displayError(phoneErrorNode, "Must contain only numbers, no spaces and only one plus at the beginning.", "phoneTimer")
             return true;
         } else if (checkShortLength(str, 5)) {
             displayError(phoneErrorNode, "Must not be shorter than 5 symbols.", "phoneTimer")
