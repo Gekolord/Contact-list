@@ -26,6 +26,12 @@ let allContacts = {
     "y": [],
     "z": []
 }
+window.addEventListener("load", () => {
+    loadFromLocalStorage()
+    renderAllColumns()
+
+})
+
 let contactTable = document.querySelector(".contact-table")
 let nameInput = document.querySelector(".form__element-name")
 let vacancyInput = document.querySelector(".form__element-vacancy")
@@ -55,6 +61,7 @@ function addPersonToContacts() {
 
     allContacts[reduceSpaces(nameInput.value.trim())[0].toLowerCase()].push(person)
     existingContacts.add(reduceSpaces(`${person.name}${person.vacancy}${person.phone}`))
+    storeOneInLocalStorage(person)
     // return person.name[0].toLowerCase()
 }
 
@@ -86,7 +93,7 @@ function renderContact(div, object) {
 // renders all contacts of corresponding letter
 function renderColumn(char) {
     const column = document.querySelector(`[data-id="${char.toLowerCase()}"]`)
-    column.innerHTML = char.toUpperCase()
+    column.innerHTML = `${char.toUpperCase()} - ${allContacts[char.toLowerCase()].length}`
     allContacts[char.toLowerCase()].forEach((obj) => {
         const newDiv = createDiv("column__element-data-info");
         const removeButton = renderButton("column__element__remove-button", '\u2716')
@@ -99,11 +106,18 @@ function renderColumn(char) {
     })
 }
 
+function renderAllColumns() {
+    Object.keys(allContacts).forEach(key => {
+        renderColumn(key)
+    })
+}
+
 // deletes item from array using filter and replaces old array with new array
 function deleteItemFromAllContats(arr, prop1, prop2, prop3, removeBy1, removeBy2, removeBy3, setValue) {
     newArr = arr.filter(item => !(item[removeBy1] === prop1 && item[removeBy2] === prop2 && item[removeBy3] === prop3))
     allContacts[prop1[0].toLowerCase()] = newArr
     existingContacts.delete(setValue)
+    localStorage.removeItem(`${prop1}${prop2}${prop3}`)
     renderColumn(prop1[0].toLowerCase())
 }
 
@@ -297,8 +311,8 @@ function validatePhoneInputAndRenderErrors() {
 
 // checks if all inputs have errors and renders necessary error messages
 function validateAllInputsAndRenderErrors() {
-    if (validateNameInputAndRenderErrors() ||
-        validatePhoneInputAndRenderErrors() ||
+    if (validateNameInputAndRenderErrors()    ||
+        validatePhoneInputAndRenderErrors()   ||
         validateVacancyInputAndRenderErrors() ||
         checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`))) 
         {
@@ -309,3 +323,38 @@ function validateAllInputsAndRenderErrors() {
         }
     return false;
 }
+// stores one object in local storage
+function storeOneInLocalStorage(obj) {
+    const dataString = JSON.stringify(obj)
+    const storeKey = `${obj.name}${obj.vacancy}${obj.phone}`
+    localStorage.setItem(storeKey, dataString)
+    console.log(localStorage)
+}
+
+// retrieves one object from local storage
+function retrieveOneFromLocalStorage(key) {
+    const retrievedDataString = localStorage.getItem(key);
+    if (retrievedDataString) {
+        const retrievedData = JSON.parse(retrievedDataString);
+        return retrievedData;
+    }
+}
+// retrieves all objects from localstorage and stores it in object
+function retrieveAllFromLocalStorage() {
+    let returnObj = {}
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        returnObj[key] = retrieveAllFromLocalStorage(key)
+    }
+    return returnObj;
+}
+
+// writes from local storage to allContacts and existingContacts
+function loadFromLocalStorage() {
+    for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i)
+        existingContacts.add(key)
+        allContacts[key[0]].push(retrieveOneFromLocalStorage(key))
+    }
+}
+ 
