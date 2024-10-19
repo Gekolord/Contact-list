@@ -26,17 +26,13 @@ let allContacts = {
     "y": [],
     "z": []
 }
-window.addEventListener("load", () => {
-    loadFromLocalStorage()
-    renderAllColumns()
-
-})
 
 let contactTable = document.querySelector(".contact-table")
 let nameInput = document.querySelector(".form__element-name")
 let vacancyInput = document.querySelector(".form__element-vacancy")
 let phoneInput = document.querySelector(".form__element-phone")
 let addButton = document.querySelector(".form__element-add")
+let clearListButton = document.querySelector(".form__element-clear-list")
 let nameErrorNode = document.querySelector(".error-message__name-error")
 let vacancyErrorNode = document.querySelector(".error-message__vacancy-error")
 let phoneErrorNode = document.querySelector(".error-message__phone-error")
@@ -46,6 +42,30 @@ const timers = {
     phoneTimer: undefined
 };
 let existingContacts = new Set();
+
+window.addEventListener("load", () => {
+    loadFromLocalStorage()
+    renderAllColumns()
+
+})
+
+addButton.addEventListener("click", function(eve) {
+    if (validateAllInputsAndRenderErrors()) {
+        return false;
+    } else if (!checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`))) {
+        addPersonToContacts()
+        console.log(allContacts)
+        console.log(existingContacts)
+        renderColumn(reduceSpaces(nameInput.value.trim())[0].toLowerCase())
+    }
+})
+
+contactTable.addEventListener("click", toggleContacts)
+
+clearListButton.addEventListener("click", (eve) => {
+    clearAll()
+    renderAllColumns()
+})
 // adds person to contacts and returns first letter of their name
 function addPersonToContacts() {
     let person = Object.fromEntries([
@@ -134,25 +154,9 @@ function toggleContacts(event) {
 }
 
 
-addButton.addEventListener("click", function(eve) {
-    if (validateAllInputsAndRenderErrors()) {
-        return false;
-    } else if (!checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`))) {
-        addPersonToContacts()
-        console.log(allContacts)
-        console.log(existingContacts)
-        renderColumn(reduceSpaces(nameInput.value.trim())[0].toLowerCase())
-    }
-})
 
 
-contactTable.addEventListener("click", toggleContacts)
 
-
-// window.addEventListener('load', function(event) {
-//     renderColumn("a")
-//     renderColumn("n")
-// })
 
 function renderButton(className, text) {
     const button = document.createElement('button')
@@ -357,4 +361,14 @@ function loadFromLocalStorage() {
         allContacts[key[0]].push(retrieveOneFromLocalStorage(key))
     }
 }
- 
+
+// clears all data 
+function clearAll() {
+    Object.keys(allContacts).forEach(key => {
+        if (allContacts[key].length > 0) {
+            allContacts[key].forEach(obj => {
+                deleteItemFromAllContats(allContacts[key], obj.name, obj.vacancy, obj.phone, "name", "vacancy", "phone", `${reduceSpaces(obj.name)}${reduceSpaces(obj.vacancy)}${reduceSpaces(obj.phone)}`)
+            })
+        }
+    })
+}

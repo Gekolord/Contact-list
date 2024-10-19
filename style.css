@@ -32,8 +32,8 @@
     min-width: 200px;
     font-size:calc(16px + 1vw);
     background-color: red;
+    cursor: pointer;
 }
-
 
 .form__element {
     font-size:calc(12px + 0.5vw);
@@ -42,6 +42,7 @@
 .column__element-data-info {
     display: none;
     position: relative;
+    cursor: default;
 }
 
 .column__element-data-info-shown {
