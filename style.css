@@ -102,3 +102,47 @@
         visibility: hidden;
     }
 }
+
+.search-window-wrapper {
+    position: fixed;
+    width: 700px;
+    height: 500px;
+    top: 25vh;
+    left: 0;
+    right: 0;
+    margin: 0 auto;
+    visibility: hidden;
+    opacity: 0;
+    background: #F6F6F6;
+}
+
+.seach-window_active {
+    visibility: visible;
+    opacity: 1;
+}
+
+.search-window-main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    gap: 20px;
+}
+
+.search-window__input {
+    width: 80%;
+    height: 1.5em;
+}
+
+.search-window__output {
+    height: 70%;
+    width: 81%;
+    background-color: black;
+}
+
+.search-window__close-window {
+    position: absolute;
+    top: 4%;
+    left: 92%;
+}
