@@ -32,10 +32,13 @@ let nameInput = document.querySelector(".form__element-name")
 let vacancyInput = document.querySelector(".form__element-vacancy")
 let phoneInput = document.querySelector(".form__element-phone")
 let addButton = document.querySelector(".form__element-add")
+let searchButton = document.querySelector(".form__element-search")
 let clearListButton = document.querySelector(".form__element-clear-list")
 let nameErrorNode = document.querySelector(".error-message__name-error")
 let vacancyErrorNode = document.querySelector(".error-message__vacancy-error")
 let phoneErrorNode = document.querySelector(".error-message__phone-error")
+let searchWindow = document.querySelector(".search-window")
+let searchWindowCloseButton = document.querySelector(".search-window__close-window")
 const timers = {
     nameTimer: undefined,
     vacancyTimer: undefined,
@@ -66,6 +69,25 @@ clearListButton.addEventListener("click", (eve) => {
     clearAll()
     renderAllColumns()
 })
+
+searchButton.addEventListener("click", event => {
+    if (!searchWindow.classList.contains("seach-window_active")) {
+        searchWindow.classList.add("seach-window_active")
+    }
+})
+
+searchWindowCloseButton.addEventListener("click", event => {
+    if (searchWindow.classList.contains("seach-window_active")) {
+        searchWindow.classList.remove("seach-window_active")
+    }
+})
+
+document.addEventListener("click", event => {
+    if (!searchWindow.contains(event.target) && event.target !== searchButton) {
+        searchWindow.classList.remove("seach-window_active")
+    }
+})
+
 // adds person to contacts and returns first letter of their name
 function addPersonToContacts() {
     let person = Object.fromEntries([
