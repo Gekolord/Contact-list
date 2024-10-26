@@ -106,7 +106,7 @@
 .search-window-wrapper {
     position: fixed;
     width: 700px;
-    height: 600px;
+    height: 500px;
     top: 25vh;
     left: 0;
     right: 0;
@@ -138,7 +138,7 @@
 .search-window__output {
     height: 70%;
     width: 81%;
-    background-color: white;
+    background-color: black;
 }
 
 .search-window__close-window {

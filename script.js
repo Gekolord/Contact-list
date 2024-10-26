@@ -32,14 +32,12 @@ let nameInput = document.querySelector(".form__element-name")
 let vacancyInput = document.querySelector(".form__element-vacancy")
 let phoneInput = document.querySelector(".form__element-phone")
 let addButton = document.querySelector(".form__element-add")
-let searchButton = document.querySelector(".form__element-search")
 let clearListButton = document.querySelector(".form__element-clear-list")
 let nameErrorNode = document.querySelector(".error-message__name-error")
 let vacancyErrorNode = document.querySelector(".error-message__vacancy-error")
 let phoneErrorNode = document.querySelector(".error-message__phone-error")
 let searchWindow = document.querySelector(".search-window")
 let searchWindowCloseButton = document.querySelector(".search-window__close-window")
-let searchWindowInput = document.querySelector(".search-window__input")
 const timers = {
     nameTimer: undefined,
     vacancyTimer: undefined,
@@ -80,14 +78,12 @@ searchButton.addEventListener("click", event => {
 searchWindowCloseButton.addEventListener("click", event => {
     if (searchWindow.classList.contains("seach-window_active")) {
         searchWindow.classList.remove("seach-window_active")
-        searchWindowInput.value = ""
     }
 })
 
 document.addEventListener("click", event => {
     if (!searchWindow.contains(event.target) && event.target !== searchButton) {
         searchWindow.classList.remove("seach-window_active")
-        searchWindowInput.value = ""
     }
 })
 
