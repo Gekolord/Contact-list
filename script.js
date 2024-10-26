@@ -39,6 +39,7 @@ let vacancyErrorNode = document.querySelector(".error-message__vacancy-error")
 let phoneErrorNode = document.querySelector(".error-message__phone-error")
 let searchWindow = document.querySelector(".search-window")
 let searchWindowCloseButton = document.querySelector(".search-window__close-window")
+let searchWindowInput = document.querySelector(".search-window__input")
 const timers = {
     nameTimer: undefined,
     vacancyTimer: undefined,
@@ -59,7 +60,7 @@ addButton.addEventListener("click", function(eve) {
         addPersonToContacts()
         console.log(allContacts)
         console.log(existingContacts)
-        renderColumn(reduceSpaces(nameInput.value.trim())[0].toLowerCase())
+        renderColumn(reduceSpaces(nameInput.value.trim())[0].toLowerCase(), document.querySelector(`[data-id="${reduceSpaces(nameInput.value[0].toLowerCase())}"]`))
     }
 })
 
@@ -79,12 +80,14 @@ searchButton.addEventListener("click", event => {
 searchWindowCloseButton.addEventListener("click", event => {
     if (searchWindow.classList.contains("seach-window_active")) {
         searchWindow.classList.remove("seach-window_active")
+        searchWindowInput.value = ""
     }
 })
 
 document.addEventListener("click", event => {
     if (!searchWindow.contains(event.target) && event.target !== searchButton) {
         searchWindow.classList.remove("seach-window_active")
+        searchWindowInput.value = ""
     }
 })
 
@@ -133,8 +136,8 @@ function renderContact(div, object) {
 }
 
 // renders all contacts of corresponding letter
-function renderColumn(char) {
-    const column = document.querySelector(`[data-id="${char.toLowerCase()}"]`)
+function renderColumn(char, column) {
+    // const column = document.querySelector(`[data-id="${char.toLowerCase()}"]`)
     column.innerHTML = `${char.toUpperCase()} - ${allContacts[char.toLowerCase()].length}`
     allContacts[char.toLowerCase()].forEach((obj) => {
         const newDiv = createDiv("column__element-data-info");
@@ -150,7 +153,7 @@ function renderColumn(char) {
 
 function renderAllColumns() {
     Object.keys(allContacts).forEach(key => {
-        renderColumn(key)
+        renderColumn(key, document.querySelector(`[data-id="${key}"]`))
     })
 }
 
@@ -160,7 +163,7 @@ function deleteItemFromAllContats(arr, prop1, prop2, prop3, removeBy1, removeBy2
     allContacts[prop1[0].toLowerCase()] = newArr
     existingContacts.delete(setValue)
     localStorage.removeItem(`${prop1}${prop2}${prop3}`)
-    renderColumn(prop1[0].toLowerCase())
+    renderColumn(prop1[0].toLowerCase(), document.querySelector(`[data-id="${prop1[0].toLowerCase()}"]`))
 }
 
 
