@@ -39,6 +39,7 @@ let phoneErrorNode = document.querySelector(".error-message__phone-error")
 let searchWindow = document.querySelector(".search-window")
 let searchWindowCloseButton = document.querySelector(".search-window__close-window")
 let searchButton = document.querySelector(".form__element-search")
+let showAllButton = document.querySelector(".search-window__show-all")
 const timers = {
     nameTimer: undefined,
     vacancyTimer: undefined,
