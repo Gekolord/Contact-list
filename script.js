@@ -93,7 +93,10 @@ searchWindowCloseButton.addEventListener("click", event => {
 })
 
 document.addEventListener("click", event => {
-    if (!searchWindow.contains(event.target) && event.target !== searchButton) {
+    if (!searchWindow.contains(event.target) 
+        && event.target !== searchButton
+        && !event.target.classList.contains("search-window__output-data-info__remove-button") 
+    ) {
         searchWindow.classList.remove("seach-window_active")
         searchWindowOutput.classList.remove("search-window__output-info-shown")
         searchWindowOutput.innerHTML = ""
@@ -168,6 +171,7 @@ function renderAllColumns() {
 
 // render all contacts in one div
 function renderAllToDiv(targetDiv) {
+
     Object.keys(allContacts).forEach((key) => {
         if (allContacts[key].length == 0) {return}
         console.log(key)
@@ -176,6 +180,8 @@ function renderAllToDiv(targetDiv) {
             const removeButton = renderButton("search-window__output-data-info__remove-button", '\u2716')
             removeButton.addEventListener('click', (eve) => {
                 deleteItemFromAllContats(allContacts[key], contact.name, contact.vacancy, contact.phone, "name", "vacancy", "phone",`${reduceSpaces(contact.name)}${reduceSpaces(contact.vacancy)}${reduceSpaces(contact.phone)}`)
+                targetDiv.innerHTML = ""
+                renderAllToDiv(targetDiv)
             })
             renderContact(newDiv, contact)
             newDiv.append(removeButton)
