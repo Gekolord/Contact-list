@@ -40,6 +40,7 @@ let searchWindow = document.querySelector(".search-window")
 let searchWindowCloseButton = document.querySelector(".search-window__close-window")
 let searchButton = document.querySelector(".form__element-search")
 let showAllButton = document.querySelector(".search-window__show-all")
+let searchWindowOutput = document.querySelector(".search-window__output")
 const timers = {
     nameTimer: undefined,
     vacancyTimer: undefined,
@@ -64,6 +65,12 @@ addButton.addEventListener("click", function(eve) {
     }
 })
 
+showAllButton.addEventListener("click", () => {
+    if (searchWindowOutput.classList.contains("search-window__output-info-shown")) return;
+    renderAllToDiv(searchWindowOutput)
+    searchWindowOutput.classList.add("search-window__output-info-shown")
+})
+
 contactTable.addEventListener("click", toggleContacts)
 
 clearListButton.addEventListener("click", (eve) => {
@@ -80,12 +87,16 @@ searchButton.addEventListener("click", event => {
 searchWindowCloseButton.addEventListener("click", event => {
     if (searchWindow.classList.contains("seach-window_active")) {
         searchWindow.classList.remove("seach-window_active")
+        searchWindowOutput.classList.remove("search-window__output-info-shown")
+        searchWindowOutput.innerHTML = ""
     }
 })
 
 document.addEventListener("click", event => {
     if (!searchWindow.contains(event.target) && event.target !== searchButton) {
         searchWindow.classList.remove("seach-window_active")
+        searchWindowOutput.classList.remove("search-window__output-info-shown")
+        searchWindowOutput.innerHTML = ""
     }
 })
 
@@ -152,6 +163,24 @@ function renderColumn(char, column) {
 function renderAllColumns() {
     Object.keys(allContacts).forEach(key => {
         renderColumn(key, document.querySelector(`[data-id="${key}"]`))
+    })
+}
+
+// render all contacts in one div
+function renderAllToDiv(targetDiv) {
+    Object.keys(allContacts).forEach((key) => {
+        if (allContacts[key].length == 0) {return}
+        console.log(key)
+        allContacts[key].forEach(contact => {
+            const newDiv = createDiv("search-window__output-data-info")
+            const removeButton = renderButton("search-window__output-data-info__remove-button", '\u2716')
+            removeButton.addEventListener('click', (eve) => {
+                deleteItemFromAllContats(allContacts[key], contact.name, contact.vacancy, contact.phone, "name", "vacancy", "phone",`${reduceSpaces(contact.name)}${reduceSpaces(contact.vacancy)}${reduceSpaces(contact.phone)}`)
+            })
+            renderContact(newDiv, contact)
+            newDiv.append(removeButton)
+            targetDiv.append(newDiv)
+        })
     })
 }
 
