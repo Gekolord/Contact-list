@@ -41,6 +41,8 @@ let searchWindowCloseButton = document.querySelector(".search-window__close-wind
 let searchButton = document.querySelector(".form__element-search")
 let showAllButton = document.querySelector(".search-window__show-all")
 let searchWindowOutput = document.querySelector(".search-window__output")
+let searchInput = document.querySelector(".search-window__input")
+
 const timers = {
     nameTimer: undefined,
     vacancyTimer: undefined,
@@ -145,6 +147,40 @@ function renderContact(div, object) {
     div.innerText = `Name: ${object.name}
                      Vacancy:${object.vacancy}
                      Phone: ${object.phone}`
+}
+
+function searchByName(array, searchString) {
+    const lowerCaseSearchString = searchString.toLowerCase();
+    return array.filter(person => 
+        person.name.toLowerCase().startsWith(lowerCaseSearchString)
+    );
+}
+
+function renderSearchedContacts(arr, targetDiv) {
+    arr.forEach(contact => {
+        console.log('s')
+    })
+}
+// "search-window__output-data-info"
+// "search-window__output-data-info__remove-button"
+// renders array of objects with specified classnames of delete buttons and divs to div
+function renderArrToDiv(
+    arr, 
+    targetDiv, 
+    contactDivClassName, 
+    deleteButtonClassName) {
+    arr.forEach(contact => {
+        const newDiv = createDiv(contactDivClassName)
+        const removeButton = renderButton(deleteButtonClassName, '\u2716')
+        removeButton.addEventListener('click', (eve) => {
+            deleteItemFromAllContats(allContacts[contact.name[0].toLowerCase()], contact.name, contact.vacancy, contact.phone, "name", "vacancy", "phone",`${reduceSpaces(contact.name)}${reduceSpaces(contact.vacancy)}${reduceSpaces(contact.phone)}`)
+            targetDiv.innerHTML = ""
+            renderAllToDiv(targetDiv)
+        })
+        renderContact(newDiv, contact)
+        newDiv.append(removeButton)
+        targetDiv.append(newDiv)
+    })
 }
 
 // renders all contacts of corresponding letter
