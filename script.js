@@ -67,6 +67,19 @@ addButton.addEventListener("click", function(eve) {
     }
 })
 
+searchInput.addEventListener("input", eve => {
+    if (!searchInput.value) {
+        searchWindowOutput.innerHTML = ""
+        return;
+    };
+    renderArrToDiv(
+        searchByName(allContacts[searchInput.value[0].toLowerCase()], searchInput.value),
+        searchWindowOutput,
+        "search-window__output-data-info",
+        "search-window__output-data-info__remove-button"
+    )
+})
+
 showAllButton.addEventListener("click", () => {
     if (searchWindowOutput.classList.contains("search-window__output-info-shown")) return;
     renderAllToDiv(searchWindowOutput)
@@ -91,19 +104,20 @@ searchWindowCloseButton.addEventListener("click", event => {
         searchWindow.classList.remove("seach-window_active")
         searchWindowOutput.classList.remove("search-window__output-info-shown")
         searchWindowOutput.innerHTML = ""
+        searchInput.value = ""
     }
 })
 
-document.addEventListener("click", event => {
-    if (!searchWindow.contains(event.target) 
-        && event.target !== searchButton
-        && !event.target.classList.contains("search-window__output-data-info__remove-button") 
-    ) {
-        searchWindow.classList.remove("seach-window_active")
-        searchWindowOutput.classList.remove("search-window__output-info-shown")
-        searchWindowOutput.innerHTML = ""
-    }
-})
+// document.addEventListener("click", event => {
+//     if (!searchWindow.contains(event.target) 
+//         && event.target !== searchButton
+//         && !event.target.classList.contains("search-window__output-data-info__remove-button") 
+//     ) {
+//         searchWindow.classList.remove("seach-window_active")
+//         searchWindowOutput.classList.remove("search-window__output-info-shown")
+//         searchWindowOutput.innerHTML = ""
+//     }
+// })
 
 // adds person to contacts and returns first letter of their name
 function addPersonToContacts() {
@@ -150,25 +164,21 @@ function renderContact(div, object) {
 }
 
 function searchByName(array, searchString) {
+    if (!array) return;
     const lowerCaseSearchString = searchString.toLowerCase();
     return array.filter(person => 
         person.name.toLowerCase().startsWith(lowerCaseSearchString)
     );
 }
 
-function renderSearchedContacts(arr, targetDiv) {
-    arr.forEach(contact => {
-        console.log('s')
-    })
-}
-// "search-window__output-data-info"
-// "search-window__output-data-info__remove-button"
 // renders array of objects with specified classnames of delete buttons and divs to div
 function renderArrToDiv(
     arr, 
     targetDiv, 
     contactDivClassName, 
     deleteButtonClassName) {
+    if (!arr) return;
+    targetDiv.innerHTML = ""
     arr.forEach(contact => {
         const newDiv = createDiv(contactDivClassName)
         const removeButton = renderButton(deleteButtonClassName, '\u2716')
@@ -211,18 +221,7 @@ function renderAllToDiv(targetDiv) {
     Object.keys(allContacts).forEach((key) => {
         if (allContacts[key].length == 0) {return}
         console.log(key)
-        allContacts[key].forEach(contact => {
-            const newDiv = createDiv("search-window__output-data-info")
-            const removeButton = renderButton("search-window__output-data-info__remove-button", '\u2716')
-            removeButton.addEventListener('click', (eve) => {
-                deleteItemFromAllContats(allContacts[key], contact.name, contact.vacancy, contact.phone, "name", "vacancy", "phone",`${reduceSpaces(contact.name)}${reduceSpaces(contact.vacancy)}${reduceSpaces(contact.phone)}`)
-                targetDiv.innerHTML = ""
-                renderAllToDiv(targetDiv)
-            })
-            renderContact(newDiv, contact)
-            newDiv.append(removeButton)
-            targetDiv.append(newDiv)
-        })
+        renderArrToDiv(allContacts[key], targetDiv, "search-window__output-data-info", "search-window__output-data-info__remove-button")
     })
 }
 
