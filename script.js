@@ -43,13 +43,13 @@ let showAllButton = document.querySelector(".search-window__show-all")
 let searchWindowOutput = document.querySelector(".search-window__output")
 let searchInput = document.querySelector(".search-window__input")
 
+
 const timers = {
     nameTimer: undefined,
     vacancyTimer: undefined,
     phoneTimer: undefined
 };
 let existingContacts = new Set();
-
 window.addEventListener("load", () => {
     loadFromLocalStorage()
     renderAllColumns()
@@ -72,6 +72,7 @@ searchInput.addEventListener("input", eve => {
         searchWindowOutput.innerHTML = ""
         return;
     };
+    searchWindowOutput.innerHTML = ""
     renderArrToDiv(
         searchByName(allContacts[searchInput.value[0].toLowerCase()], searchInput.value),
         searchWindowOutput,
@@ -81,7 +82,8 @@ searchInput.addEventListener("input", eve => {
 })
 
 showAllButton.addEventListener("click", () => {
-    if (searchWindowOutput.classList.contains("search-window__output-info-shown")) return;
+    searchInput.value = ""
+    searchWindowOutput.innerHTML = ""
     renderAllToDiv(searchWindowOutput)
     searchWindowOutput.classList.add("search-window__output-info-shown")
 })
@@ -178,14 +180,22 @@ function renderArrToDiv(
     contactDivClassName, 
     deleteButtonClassName) {
     if (!arr) return;
-    targetDiv.innerHTML = ""
+    // 
     arr.forEach(contact => {
         const newDiv = createDiv(contactDivClassName)
         const removeButton = renderButton(deleteButtonClassName, '\u2716')
         removeButton.addEventListener('click', (eve) => {
-            deleteItemFromAllContats(allContacts[contact.name[0].toLowerCase()], contact.name, contact.vacancy, contact.phone, "name", "vacancy", "phone",`${reduceSpaces(contact.name)}${reduceSpaces(contact.vacancy)}${reduceSpaces(contact.phone)}`)
+            if (searchInput.value != false) {
+                deleteItemFromAllContats(allContacts[contact.name[0].toLowerCase()], contact.name, contact.vacancy, contact.phone, "name", "vacancy", "phone",`${reduceSpaces(contact.name)}${reduceSpaces(contact.vacancy)}${reduceSpaces(contact.phone)}`)
+                targetDiv.innerHTML = ""
+                renderArrToDiv(searchByName(allContacts[searchInput.value[0].toLowerCase()], searchInput.value),
+                    searchWindowOutput,
+                    "search-window__output-data-info",
+                    "search-window__output-data-info__remove-button")
+            }
+            else {deleteItemFromAllContats(allContacts[contact.name[0].toLowerCase()], contact.name, contact.vacancy, contact.phone, "name", "vacancy", "phone",`${reduceSpaces(contact.name)}${reduceSpaces(contact.vacancy)}${reduceSpaces(contact.phone)}`)
             targetDiv.innerHTML = ""
-            renderAllToDiv(targetDiv)
+            renderAllToDiv(targetDiv)}
         })
         renderContact(newDiv, contact)
         newDiv.append(removeButton)
