@@ -1,4 +1,39 @@
-let allContacts = {
+interface contact {
+    name: string;
+    vacancy: string;
+    phone: string;
+}
+
+interface allContacts {
+    a: contact[];
+    b: contact[];
+    c: contact[];
+    d: contact[];
+    e: contact[];
+    f: contact[];
+    g: contact[];
+    h: contact[];
+    i: contact[];
+    j: contact[];
+    k: contact[];
+    l: contact[];
+    m: contact[];
+    n: contact[];
+    o: contact[];
+    p: contact[];
+    q: contact[];
+    r: contact[];
+    s: contact[];
+    t: contact[];
+    u: contact[];
+    v: contact[];
+    w: contact[];
+    x: contact[];
+    y: contact[];
+    z: contact[];
+}
+
+const allContacts: allContacts = {
     "a": [],
     "b": [],
     "c": [],
