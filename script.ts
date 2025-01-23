@@ -39,21 +39,21 @@ const allContacts: allContacts = {
     "z": []
 }
 
-let contactTable = document.querySelector<any>(".contact-table")
-let nameInput = document.querySelector<any>(".form__element-name")
-let vacancyInput = document.querySelector<any>(".form__element-vacancy")
-let phoneInput = document.querySelector<any>(".form__element-phone")
-let addButton = document.querySelector<any>(".form__element-add")
-let clearListButton = document.querySelector<any>(".form__element-clear-list")
-let nameErrorNode = document.querySelector<any>(".error-message__name-error")
-let vacancyErrorNode = document.querySelector<any>(".error-message__vacancy-error")
-let phoneErrorNode = document.querySelector<any>(".error-message__phone-error")
-let searchWindow = document.querySelector<any>(".search-window")
-let searchWindowCloseButton = document.querySelector<any>(".search-window__close-window")
-let searchButton = document.querySelector<any>(".form__element-search")
-let showAllButton = document.querySelector<any>(".search-window__show-all")
-let searchWindowOutput = document.querySelector<any>(".search-window__output")
-let searchInput = document.querySelector<any>(".search-window__input")
+let contactTable = document.querySelector(".contact-table") as HTMLDivElement
+let nameInput = document.querySelector(".form__element-name") as HTMLInputElement
+let vacancyInput = document.querySelector(".form__element-vacancy") as HTMLInputElement
+let phoneInput = document.querySelector(".form__element-phone") as HTMLInputElement
+let addButton = document.querySelector(".form__element-add") as HTMLInputElement
+let clearListButton = document.querySelector(".form__element-clear-list") as HTMLInputElement
+let nameErrorNode = document.querySelector(".error-message__name-error") as HTMLSpanElement
+let vacancyErrorNode = document.querySelector(".error-message__vacancy-error") as HTMLSpanElement
+let phoneErrorNode = document.querySelector(".error-message__phone-error") as HTMLSpanElement
+let searchWindow = document.querySelector(".search-window") as HTMLDivElement
+let searchWindowCloseButton = document.querySelector(".search-window__close-window") as HTMLInputElement
+let searchButton = document.querySelector(".form__element-search") as HTMLInputElement
+let showAllButton = document.querySelector(".search-window__show-all") as HTMLInputElement
+let searchWindowOutput = document.querySelector(".search-window__output") as HTMLDivElement
+let searchInput = document.querySelector(".search-window__input") as HTMLInputElement
 
 type divToRender = HTMLDivElement | null
 
@@ -191,7 +191,7 @@ function renderArrToDiv(
         const newDiv: HTMLDivElement = createDiv(contactDivClassName)
         const removeButton: HTMLButtonElement = renderButton(deleteButtonClassName, '\u2716')
         removeButton.addEventListener('click', (): void => {
-            if (searchInput.value != false) {
+            if (searchInput.value.length !== 0) {
                 deleteItemFromAllContats(allContacts[contact.name[0].toLowerCase()], contact.name, contact.vacancy, contact.phone, "name", "vacancy", "phone",`${reduceSpaces(contact.name)}${reduceSpaces(contact.vacancy)}${reduceSpaces(contact.phone)}`)
                 targetDiv.innerHTML = ""
                 renderArrToDiv(searchByName(allContacts[searchInput.value[0].toLowerCase()], searchInput.value),

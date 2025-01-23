@@ -152,7 +152,7 @@ function renderArrToDiv(arr, targetDiv, contactDivClassName, deleteButtonClassNa
         const newDiv = createDiv(contactDivClassName);
         const removeButton = renderButton(deleteButtonClassName, '\u2716');
         removeButton.addEventListener('click', () => {
-            if (searchInput.value != false) {
+            if (searchInput.value.length !== 0) {
                 deleteItemFromAllContats(allContacts[contact.name[0].toLowerCase()], contact.name, contact.vacancy, contact.phone, "name", "vacancy", "phone", `${reduceSpaces(contact.name)}${reduceSpaces(contact.vacancy)}${reduceSpaces(contact.phone)}`);
                 targetDiv.innerHTML = "";
                 renderArrToDiv(searchByName(allContacts[searchInput.value[0].toLowerCase()], searchInput.value), searchWindowOutput, "search-window__output-data-info", "search-window__output-data-info__remove-button");
