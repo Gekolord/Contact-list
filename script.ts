@@ -1,7 +1,5 @@
 interface contact {
-    name: string;
-    vacancy: string;
-    phone: string;
+    [key: string]: string
 }
 
 interface allContacts {
@@ -59,6 +57,7 @@ let showAllButton = document.querySelector<any>(".search-window__show-all")
 let searchWindowOutput = document.querySelector<any>(".search-window__output")
 let searchInput = document.querySelector<any>(".search-window__input")
 
+type divToRender = HTMLDivElement | null
 
 const timers: timers = {
     nameTimer: undefined,
@@ -66,25 +65,27 @@ const timers: timers = {
     phoneTimer: undefined
 };
 let existingContacts: Set<string> = new Set();
-window.addEventListener("load", () => {
+window.addEventListener("load", (): void => {
     loadFromLocalStorage()
     renderAllColumns()
 
 })
 
-addButton.addEventListener("click", function() {
+addButton.addEventListener("click", function(): void | boolean {
     if (validateAllInputsAndRenderErrors()) {
         return false;
     } else if (!checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput!.value)}${reduceSpaces(vacancyInput!.value)}${reduceSpaces(phoneInput!.value)}`))) {
         addPersonToContacts()
         console.log(allContacts)
         console.log(existingContacts)
-        renderColumn(reduceSpaces(nameInput!.value.trim())[0].toLowerCase(), document.querySelector(`[data-id="${reduceSpaces(nameInput!.value[0].toLowerCase())}"]`))
+        const toRender: divToRender = document.querySelector(`[data-id="${reduceSpaces(nameInput!.value[0].toLowerCase())}"]`)
+        if (toRender) {
+        renderColumn(reduceSpaces(nameInput!.value.trim())[0].toLowerCase(), toRender)}
     }
 })
 
 
-searchInput.addEventListener("input", () => {
+searchInput.addEventListener("input", (): void => {
         if (!searchInput!.value) {
             searchWindowOutput!.innerHTML = ""
             return;
@@ -99,7 +100,7 @@ searchInput.addEventListener("input", () => {
     })
 
 
-showAllButton!.addEventListener("click", () => {
+showAllButton!.addEventListener("click", (): void => {
     searchInput!.value = ""
     searchWindowOutput!.innerHTML = ""
     renderAllToDiv(searchWindowOutput)
@@ -108,18 +109,18 @@ showAllButton!.addEventListener("click", () => {
 
 contactTable!.addEventListener("click", toggleContacts)
 
-clearListButton!.addEventListener("click", () => {
+clearListButton!.addEventListener("click", (): void => {
     clearAll()
     renderAllColumns()
 })
 
-searchButton!.addEventListener("click", () => {
+searchButton!.addEventListener("click", (): void => {
     if (!searchWindow!.classList.contains("seach-window_active")) {
         searchWindow!.classList.add("seach-window_active")
     }
 })
 
-searchWindowCloseButton.addEventListener("click", () => {
+searchWindowCloseButton.addEventListener("click", (): void => {
     if (searchWindow.classList.contains("seach-window_active")) {
         searchWindow.classList.remove("seach-window_active")
         searchWindowOutput.classList.remove("search-window__output-info-shown")
@@ -130,7 +131,7 @@ searchWindowCloseButton.addEventListener("click", () => {
 
 // adds person to contacts and returns first letter of their name
 function addPersonToContacts(): void | true {
-    let person = Object.fromEntries([
+    let person: {[key: string]: string} | null = Object.fromEntries([
         ['name', reduceSpaces(nameInput.value.trim())],
         ['vacancy', reduceSpaces(vacancyInput.value.trim())],
         ['phone', reduceSpaces(phoneInput.value.trim())]
@@ -148,11 +149,11 @@ function addPersonToContacts(): void | true {
 }
 
 // reduces more than one consecutive spaces in a string to just one and returns it
-function reduceSpaces(str) {
+function reduceSpaces(str: string): string {
     return str.replace(/\s+/g, ' ').trim();
 }
 
-function checkExistingContact(str) {
+function checkExistingContact(str: string): boolean {
     if (!checkForEmpty(str)) {
         return existingContacts.has(str)
     }
@@ -160,19 +161,19 @@ function checkExistingContact(str) {
 }
 
 // Create a div with a class
-function createDiv(className) {
+function createDiv(className: string): HTMLDivElement {
     const div = document.createElement('div')
     div.classList.add(className)
     return div;
 }
 // adds inner text to existing div
-function renderContact(div, object) {
+function renderContact(div: HTMLDivElement, object: contact): void {
     div.innerText = `Name: ${object.name}
                      Vacancy:${object.vacancy}
                      Phone: ${object.phone}`
 }
 
-function searchByName(array, searchString) {
+function searchByName(array: contact[], searchString: string): contact[] | void {
     if (!array) return;
     const lowerCaseSearchString = searchString.toLowerCase();
     return array.filter(person => 
@@ -182,10 +183,10 @@ function searchByName(array, searchString) {
 
 // renders array of objects with specified classnames of delete buttons and divs to div
 function renderArrToDiv(
-    arr, 
-    targetDiv, 
-    contactDivClassName, 
-    deleteButtonClassName) {
+    arr: contact[] | void, 
+    targetDiv: HTMLDivElement, 
+    contactDivClassName: string, 
+    deleteButtonClassName: string): void {
     if (!arr) return;
     // 
     arr.forEach(contact => {
@@ -211,7 +212,7 @@ function renderArrToDiv(
 }
 
 // renders all contacts of corresponding letter
-function renderColumn(char, column) {
+function renderColumn(char: string, column: HTMLDivElement) {
     // const column = document.querySelector(`[data-id="${char.toLowerCase()}"]`)
     column.innerHTML = `${char.toUpperCase()} - ${allContacts[char.toLowerCase()].length}`
     allContacts[char.toLowerCase()].forEach((obj) => {
@@ -228,7 +229,10 @@ function renderColumn(char, column) {
 
 function renderAllColumns() {
     Object.keys(allContacts).forEach(key => {
-        renderColumn(key, document.querySelector(`[data-id="${key}"]`))
+        const renderedDiv: divToRender = document.querySelector(`[data-id="${key}"]`)
+        if (renderedDiv) {
+            renderColumn(key, renderedDiv)
+        }
     })
 }
 
