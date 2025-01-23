@@ -33,6 +33,12 @@ interface allContacts {
     z: contact[];
 }
 
+interface timers {
+    nameTimer: undefined | number;
+    vacancyTimer: undefined | number;
+    phoneTimer: undefined | number;
+}
+
 const allContacts: allContacts = {
     "a": [],
     "b": [],
@@ -62,24 +68,24 @@ const allContacts: allContacts = {
     "z": []
 }
 
-let contactTable = document.querySelector(".contact-table")
-let nameInput = document.querySelector(".form__element-name")
-let vacancyInput = document.querySelector(".form__element-vacancy")
-let phoneInput = document.querySelector(".form__element-phone")
-let addButton = document.querySelector(".form__element-add")
-let clearListButton = document.querySelector(".form__element-clear-list")
-let nameErrorNode = document.querySelector(".error-message__name-error")
-let vacancyErrorNode = document.querySelector(".error-message__vacancy-error")
-let phoneErrorNode = document.querySelector(".error-message__phone-error")
-let searchWindow = document.querySelector(".search-window")
-let searchWindowCloseButton = document.querySelector(".search-window__close-window")
-let searchButton = document.querySelector(".form__element-search")
-let showAllButton = document.querySelector(".search-window__show-all")
-let searchWindowOutput = document.querySelector(".search-window__output")
-let searchInput = document.querySelector(".search-window__input")
+let contactTable = document.querySelector<HTMLDivElement>(".contact-table")
+let nameInput = document.querySelector<HTMLInputElement>(".form__element-name")
+let vacancyInput = document.querySelector<HTMLInputElement>(".form__element-vacancy")
+let phoneInput = document.querySelector<HTMLInputElement>(".form__element-phone")
+let addButton = document.querySelector<HTMLInputElement>(".form__element-add")
+let clearListButton = document.querySelector<HTMLInputElement>(".form__element-clear-list")
+let nameErrorNode = document.querySelector<HTMLSpanElement>(".error-message__name-error")
+let vacancyErrorNode = document.querySelector<HTMLSpanElement>(".error-message__vacancy-error")
+let phoneErrorNode = document.querySelector<HTMLSpanElement>(".error-message__phone-error")
+let searchWindow = document.querySelector<HTMLDivElement>(".search-window")
+let searchWindowCloseButton = document.querySelector<HTMLInputElement>(".search-window__close-window")
+let searchButton = document.querySelector<HTMLInputElement>(".form__element-search")
+let showAllButton = document.querySelector<HTMLInputElement>(".search-window__show-all")
+let searchWindowOutput = document.querySelector<HTMLDivElement>(".search-window__output")
+let searchInput = document.querySelector<HTMLInputElement>(".search-window__input")
 
 
-const timers = {
+const timers: timers = {
     nameTimer: undefined,
     vacancyTimer: undefined,
     phoneTimer: undefined
