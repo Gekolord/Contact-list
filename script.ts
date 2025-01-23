@@ -5,32 +5,7 @@ interface contact {
 }
 
 interface allContacts {
-    a: contact[];
-    b: contact[];
-    c: contact[];
-    d: contact[];
-    e: contact[];
-    f: contact[];
-    g: contact[];
-    h: contact[];
-    i: contact[];
-    j: contact[];
-    k: contact[];
-    l: contact[];
-    m: contact[];
-    n: contact[];
-    o: contact[];
-    p: contact[];
-    q: contact[];
-    r: contact[];
-    s: contact[];
-    t: contact[];
-    u: contact[];
-    v: contact[];
-    w: contact[];
-    x: contact[];
-    y: contact[];
-    z: contact[];
+    [key: string]: contact[]
 }
 
 interface timers {
@@ -68,21 +43,21 @@ const allContacts: allContacts = {
     "z": []
 }
 
-let contactTable = document.querySelector<HTMLDivElement>(".contact-table")
-let nameInput = document.querySelector<HTMLInputElement>(".form__element-name")
-let vacancyInput = document.querySelector<HTMLInputElement>(".form__element-vacancy")
-let phoneInput = document.querySelector<HTMLInputElement>(".form__element-phone")
-let addButton = document.querySelector<HTMLInputElement>(".form__element-add")
-let clearListButton = document.querySelector<HTMLInputElement>(".form__element-clear-list")
-let nameErrorNode = document.querySelector<HTMLSpanElement>(".error-message__name-error")
-let vacancyErrorNode = document.querySelector<HTMLSpanElement>(".error-message__vacancy-error")
-let phoneErrorNode = document.querySelector<HTMLSpanElement>(".error-message__phone-error")
-let searchWindow = document.querySelector<HTMLDivElement>(".search-window")
-let searchWindowCloseButton = document.querySelector<HTMLInputElement>(".search-window__close-window")
-let searchButton = document.querySelector<HTMLInputElement>(".form__element-search")
-let showAllButton = document.querySelector<HTMLInputElement>(".search-window__show-all")
-let searchWindowOutput = document.querySelector<HTMLDivElement>(".search-window__output")
-let searchInput = document.querySelector<HTMLInputElement>(".search-window__input")
+let contactTable = document.querySelector<any>(".contact-table")
+let nameInput = document.querySelector<any>(".form__element-name")
+let vacancyInput = document.querySelector<any>(".form__element-vacancy")
+let phoneInput = document.querySelector<any>(".form__element-phone")
+let addButton = document.querySelector<any>(".form__element-add")
+let clearListButton = document.querySelector<any>(".form__element-clear-list")
+let nameErrorNode = document.querySelector<any>(".error-message__name-error")
+let vacancyErrorNode = document.querySelector<any>(".error-message__vacancy-error")
+let phoneErrorNode = document.querySelector<any>(".error-message__phone-error")
+let searchWindow = document.querySelector<any>(".search-window")
+let searchWindowCloseButton = document.querySelector<any>(".search-window__close-window")
+let searchButton = document.querySelector<any>(".form__element-search")
+let showAllButton = document.querySelector<any>(".search-window__show-all")
+let searchWindowOutput = document.querySelector<any>(".search-window__output")
+let searchInput = document.querySelector<any>(".search-window__input")
 
 
 const timers: timers = {
@@ -90,59 +65,61 @@ const timers: timers = {
     vacancyTimer: undefined,
     phoneTimer: undefined
 };
-let existingContacts = new Set();
+let existingContacts: Set<string> = new Set();
 window.addEventListener("load", () => {
     loadFromLocalStorage()
     renderAllColumns()
 
 })
 
-addButton.addEventListener("click", function(eve) {
+addButton.addEventListener("click", function() {
     if (validateAllInputsAndRenderErrors()) {
         return false;
-    } else if (!checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`))) {
+    } else if (!checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput!.value)}${reduceSpaces(vacancyInput!.value)}${reduceSpaces(phoneInput!.value)}`))) {
         addPersonToContacts()
         console.log(allContacts)
         console.log(existingContacts)
-        renderColumn(reduceSpaces(nameInput.value.trim())[0].toLowerCase(), document.querySelector(`[data-id="${reduceSpaces(nameInput.value[0].toLowerCase())}"]`))
+        renderColumn(reduceSpaces(nameInput!.value.trim())[0].toLowerCase(), document.querySelector(`[data-id="${reduceSpaces(nameInput!.value[0].toLowerCase())}"]`))
     }
 })
 
-searchInput.addEventListener("input", eve => {
-    if (!searchInput.value) {
-        searchWindowOutput.innerHTML = ""
-        return;
-    };
-    searchWindowOutput.innerHTML = ""
-    renderArrToDiv(
-        searchByName(allContacts[searchInput.value[0].toLowerCase()], searchInput.value),
-        searchWindowOutput,
-        "search-window__output-data-info",
-        "search-window__output-data-info__remove-button"
-    )
-})
 
-showAllButton.addEventListener("click", () => {
-    searchInput.value = ""
-    searchWindowOutput.innerHTML = ""
+searchInput.addEventListener("input", () => {
+        if (!searchInput!.value) {
+            searchWindowOutput!.innerHTML = ""
+            return;
+        };
+        searchWindowOutput!.innerHTML = ""
+        renderArrToDiv(
+            searchByName(allContacts[searchInput!.value[0].toLowerCase()], searchInput!.value),
+            searchWindowOutput,
+            "search-window__output-data-info",
+            "search-window__output-data-info__remove-button"
+        )
+    })
+
+
+showAllButton!.addEventListener("click", () => {
+    searchInput!.value = ""
+    searchWindowOutput!.innerHTML = ""
     renderAllToDiv(searchWindowOutput)
-    searchWindowOutput.classList.add("search-window__output-info-shown")
+    searchWindowOutput!.classList.add("search-window__output-info-shown")
 })
 
-contactTable.addEventListener("click", toggleContacts)
+contactTable!.addEventListener("click", toggleContacts)
 
-clearListButton.addEventListener("click", (eve) => {
+clearListButton!.addEventListener("click", () => {
     clearAll()
     renderAllColumns()
 })
 
-searchButton.addEventListener("click", event => {
-    if (!searchWindow.classList.contains("seach-window_active")) {
-        searchWindow.classList.add("seach-window_active")
+searchButton!.addEventListener("click", () => {
+    if (!searchWindow!.classList.contains("seach-window_active")) {
+        searchWindow!.classList.add("seach-window_active")
     }
 })
 
-searchWindowCloseButton.addEventListener("click", event => {
+searchWindowCloseButton.addEventListener("click", () => {
     if (searchWindow.classList.contains("seach-window_active")) {
         searchWindow.classList.remove("seach-window_active")
         searchWindowOutput.classList.remove("search-window__output-info-shown")
@@ -151,19 +128,8 @@ searchWindowCloseButton.addEventListener("click", event => {
     }
 })
 
-// document.addEventListener("click", event => {
-//     if (!searchWindow.contains(event.target) 
-//         && event.target !== searchButton
-//         && !event.target.classList.contains("search-window__output-data-info__remove-button") 
-//     ) {
-//         searchWindow.classList.remove("seach-window_active")
-//         searchWindowOutput.classList.remove("search-window__output-info-shown")
-//         searchWindowOutput.innerHTML = ""
-//     }
-// })
-
 // adds person to contacts and returns first letter of their name
-function addPersonToContacts() {
+function addPersonToContacts(): void | true {
     let person = Object.fromEntries([
         ['name', reduceSpaces(nameInput.value.trim())],
         ['vacancy', reduceSpaces(vacancyInput.value.trim())],
