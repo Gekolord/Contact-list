@@ -1,6 +1,10 @@
 interface contact {
-    [key: string]: string
+    name: string;
+    vacancy: string;
+    phone: string;
 }
+
+type contactKeys = "name" | "vacancy" | "phone"
 
 interface allContacts {
     [key: string]: contact[]
@@ -129,14 +133,15 @@ searchWindowCloseButton.addEventListener("click", (): void => {
 
 // adds person to contacts and returns first letter of their name
 function addPersonToContacts(): void | true {
-    let person: {[key: string]: string} | null = Object.fromEntries([
+    const entries: [keyof contact, string][] = [
         ['name', reduceSpaces(nameInput.value.trim())],
         ['vacancy', reduceSpaces(vacancyInput.value.trim())],
         ['phone', reduceSpaces(phoneInput.value.trim())]
-    ])
+    ]
+    let person = Object.fromEntries(entries) as Record<contactKeys, string>
     if (checkExistingContact(reduceSpaces(`${person.name}${person.vacancy}${person.phone}`))) {
 
-        person = null
+        // person = null
         return true;
     }
 
@@ -245,7 +250,7 @@ function renderAllToDiv(targetDiv: HTMLDivElement): void {
 }
 
 // deletes item from array using filter and replaces old array with new array
-function deleteItemFromAllContats(arr: contact[], prop1: string, prop2: string, prop3: string, removeBy1: string, removeBy2: string, removeBy3: string, setValue: string): void {
+function deleteItemFromAllContats(arr: contact[], prop1: string, prop2: string, prop3: string, removeBy1: contactKeys, removeBy2: contactKeys, removeBy3: contactKeys, setValue: string): void {
     const newArr: contact[] = arr.filter(item => !(item[removeBy1] === prop1 && item[removeBy2] === prop2 && item[removeBy3] === prop3))
     allContacts[prop1[0].toLowerCase()] = newArr
     existingContacts.delete(setValue)
