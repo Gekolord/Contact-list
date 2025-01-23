@@ -52,7 +52,7 @@ window.addEventListener("load", () => {
     loadFromLocalStorage();
     renderAllColumns();
 });
-addButton.addEventListener("click", function (eve) {
+addButton.addEventListener("click", function () {
     if (validateAllInputsAndRenderErrors()) {
         return false;
     }
@@ -60,10 +60,13 @@ addButton.addEventListener("click", function (eve) {
         addPersonToContacts();
         console.log(allContacts);
         console.log(existingContacts);
-        renderColumn(reduceSpaces(nameInput.value.trim())[0].toLowerCase(), document.querySelector(`[data-id="${reduceSpaces(nameInput.value[0].toLowerCase())}"]`));
+        const toRender = document.querySelector(`[data-id="${reduceSpaces(nameInput.value[0].toLowerCase())}"]`);
+        if (toRender) {
+            renderColumn(reduceSpaces(nameInput.value.trim())[0].toLowerCase(), toRender);
+        }
     }
 });
-searchInput.addEventListener("input", eve => {
+searchInput.addEventListener("input", () => {
     if (!searchInput.value) {
         searchWindowOutput.innerHTML = "";
         return;
@@ -79,16 +82,16 @@ showAllButton.addEventListener("click", () => {
     searchWindowOutput.classList.add("search-window__output-info-shown");
 });
 contactTable.addEventListener("click", toggleContacts);
-clearListButton.addEventListener("click", (eve) => {
+clearListButton.addEventListener("click", () => {
     clearAll();
     renderAllColumns();
 });
-searchButton.addEventListener("click", event => {
+searchButton.addEventListener("click", () => {
     if (!searchWindow.classList.contains("seach-window_active")) {
         searchWindow.classList.add("seach-window_active");
     }
 });
-searchWindowCloseButton.addEventListener("click", event => {
+searchWindowCloseButton.addEventListener("click", () => {
     if (searchWindow.classList.contains("seach-window_active")) {
         searchWindow.classList.remove("seach-window_active");
         searchWindowOutput.classList.remove("search-window__output-info-shown");
@@ -96,16 +99,6 @@ searchWindowCloseButton.addEventListener("click", event => {
         searchInput.value = "";
     }
 });
-// document.addEventListener("click", event => {
-//     if (!searchWindow.contains(event.target) 
-//         && event.target !== searchButton
-//         && !event.target.classList.contains("search-window__output-data-info__remove-button") 
-//     ) {
-//         searchWindow.classList.remove("seach-window_active")
-//         searchWindowOutput.classList.remove("search-window__output-info-shown")
-//         searchWindowOutput.innerHTML = ""
-//     }
-// })
 // adds person to contacts and returns first letter of their name
 function addPersonToContacts() {
     let person = Object.fromEntries([
@@ -158,7 +151,7 @@ function renderArrToDiv(arr, targetDiv, contactDivClassName, deleteButtonClassNa
     arr.forEach(contact => {
         const newDiv = createDiv(contactDivClassName);
         const removeButton = renderButton(deleteButtonClassName, '\u2716');
-        removeButton.addEventListener('click', (eve) => {
+        removeButton.addEventListener('click', () => {
             if (searchInput.value != false) {
                 deleteItemFromAllContats(allContacts[contact.name[0].toLowerCase()], contact.name, contact.vacancy, contact.phone, "name", "vacancy", "phone", `${reduceSpaces(contact.name)}${reduceSpaces(contact.vacancy)}${reduceSpaces(contact.phone)}`);
                 targetDiv.innerHTML = "";
@@ -182,7 +175,7 @@ function renderColumn(char, column) {
     allContacts[char.toLowerCase()].forEach((obj) => {
         const newDiv = createDiv("column__element-data-info");
         const removeButton = renderButton("column__element__remove-button", '\u2716');
-        removeButton.addEventListener('click', (eve) => {
+        removeButton.addEventListener('click', () => {
             deleteItemFromAllContats(allContacts[char.toLowerCase()], obj.name, obj.vacancy, obj.phone, "name", "vacancy", "phone", `${reduceSpaces(obj.name)}${reduceSpaces(obj.vacancy)}${reduceSpaces(obj.phone)}`);
         });
         renderContact(newDiv, obj);
@@ -192,7 +185,10 @@ function renderColumn(char, column) {
 }
 function renderAllColumns() {
     Object.keys(allContacts).forEach(key => {
-        renderColumn(key, document.querySelector(`[data-id="${key}"]`));
+        const renderedDiv = document.querySelector(`[data-id="${key}"]`);
+        if (renderedDiv) {
+            renderColumn(key, renderedDiv);
+        }
     });
 }
 // render all contacts in one div
@@ -207,21 +203,28 @@ function renderAllToDiv(targetDiv) {
 }
 // deletes item from array using filter and replaces old array with new array
 function deleteItemFromAllContats(arr, prop1, prop2, prop3, removeBy1, removeBy2, removeBy3, setValue) {
-    newArr = arr.filter(item => !(item[removeBy1] === prop1 && item[removeBy2] === prop2 && item[removeBy3] === prop3));
+    const newArr = arr.filter(item => !(item[removeBy1] === prop1 && item[removeBy2] === prop2 && item[removeBy3] === prop3));
     allContacts[prop1[0].toLowerCase()] = newArr;
     existingContacts.delete(setValue);
     localStorage.removeItem(`${prop1}${prop2}${prop3}`);
-    renderColumn(prop1[0].toLowerCase(), document.querySelector(`[data-id="${prop1[0].toLowerCase()}"]`));
+    const renderedDiv = document.querySelector(`[data-id="${prop1[0].toLowerCase()}"]`);
+    if (renderedDiv) {
+        renderColumn(prop1[0].toLowerCase(), renderedDiv);
+    }
 }
 function toggleContacts(event) {
-    let column = event.target.closest("div");
-    if (!column)
-        return;
-    if (!column.classList.contains("element__letter"))
-        return;
-    let displayedContacts = column.children;
-    for (contact of displayedContacts) {
-        contact.classList.toggle("column__element-data-info-shown");
+    const target = event.target;
+    const closestDiv = target.closest("div");
+    if (closestDiv) {
+        let column = closestDiv;
+        if (!column)
+            return;
+        if (!column.classList.contains("element__letter"))
+            return;
+        let displayedContacts = column.children;
+        for (const contactDiv of displayedContacts) {
+            contactDiv.classList.toggle("column__element-data-info-shown");
+        }
     }
 }
 function renderButton(className, text) {
@@ -245,7 +248,7 @@ function checkLongLength(str, num) {
 }
 // return true if str is empty
 function checkForEmpty(str) {
-    return !str.trim();
+    return str.trim().length === 0;
 }
 // return true if str doesnt start with +
 function checkIfDoesntStartsWithPlus(str) {
@@ -408,21 +411,17 @@ function retrieveOneFromLocalStorage(key) {
         return retrievedData;
     }
 }
-// retrieves all objects from localstorage and stores it in object
-function retrieveAllFromLocalStorage() {
-    let returnObj = {};
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        returnObj[key] = retrieveAllFromLocalStorage(key);
-    }
-    return returnObj;
-}
 // writes from local storage to allContacts and existingContacts
 function loadFromLocalStorage() {
     for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        existingContacts.add(key);
-        allContacts[key[0]].push(retrieveOneFromLocalStorage(key));
+        if (key) {
+            const retrievedContact = retrieveOneFromLocalStorage(key);
+            existingContacts.add(key);
+            if (retrievedContact) {
+                allContacts[key[0]].push(retrievedContact);
+            }
+        }
     }
 }
 // clears all data 

@@ -455,11 +455,11 @@ function storeOneInLocalStorage(obj: contact) {
 }
 
 // retrieves one object from local storage
-function retrieveOneFromLocalStorage(key: string): string | void {
+function retrieveOneFromLocalStorage(key: string): contact | void {
 
     const retrievedDataString: string | null = localStorage.getItem(key);
     if (retrievedDataString) {
-        const retrievedData = JSON.parse(retrievedDataString);
+        const retrievedData: contact = JSON.parse(retrievedDataString);
         return retrievedData;
     }
 }
@@ -469,14 +469,17 @@ function loadFromLocalStorage(): void {
     for (let i = 0; i < localStorage.length; i++) {
         const key: string | null = localStorage.key(i)
         if (key) {
+            const retrievedContact: contact | void = retrieveOneFromLocalStorage(key)
             existingContacts.add(key)
-            allContacts[key[0]].push(retrieveOneFromLocalStorage(key))
+            if (retrievedContact) {
+                allContacts[key[0]].push(retrievedContact)
+            }
         }
     }
 }
 
 // clears all data 
-function clearAll() {
+function clearAll(): void {
     Object.keys(allContacts).forEach(key => {
         if (allContacts[key].length > 0) {
             allContacts[key].forEach(obj => {
