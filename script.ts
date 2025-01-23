@@ -162,7 +162,7 @@ function checkExistingContact(str: string): boolean {
 
 // Create a div with a class
 function createDiv(className: string): HTMLDivElement {
-    const div = document.createElement('div')
+    const div: HTMLDivElement = document.createElement('div')
     div.classList.add(className)
     return div;
 }
@@ -175,7 +175,7 @@ function renderContact(div: HTMLDivElement, object: contact): void {
 
 function searchByName(array: contact[], searchString: string): contact[] | void {
     if (!array) return;
-    const lowerCaseSearchString = searchString.toLowerCase();
+    const lowerCaseSearchString: string = searchString.toLowerCase();
     return array.filter(person => 
         person.name.toLowerCase().startsWith(lowerCaseSearchString)
     );
@@ -190,9 +190,9 @@ function renderArrToDiv(
     if (!arr) return;
     // 
     arr.forEach(contact => {
-        const newDiv = createDiv(contactDivClassName)
-        const removeButton = renderButton(deleteButtonClassName, '\u2716')
-        removeButton.addEventListener('click', (eve) => {
+        const newDiv: HTMLDivElement = createDiv(contactDivClassName)
+        const removeButton: HTMLButtonElement = renderButton(deleteButtonClassName, '\u2716')
+        removeButton.addEventListener('click', (): void => {
             if (searchInput.value != false) {
                 deleteItemFromAllContats(allContacts[contact.name[0].toLowerCase()], contact.name, contact.vacancy, contact.phone, "name", "vacancy", "phone",`${reduceSpaces(contact.name)}${reduceSpaces(contact.vacancy)}${reduceSpaces(contact.phone)}`)
                 targetDiv.innerHTML = ""
@@ -212,13 +212,13 @@ function renderArrToDiv(
 }
 
 // renders all contacts of corresponding letter
-function renderColumn(char: string, column: HTMLDivElement) {
+function renderColumn(char: string, column: HTMLDivElement): void {
     // const column = document.querySelector(`[data-id="${char.toLowerCase()}"]`)
     column.innerHTML = `${char.toUpperCase()} - ${allContacts[char.toLowerCase()].length}`
     allContacts[char.toLowerCase()].forEach((obj) => {
-        const newDiv = createDiv("column__element-data-info");
-        const removeButton = renderButton("column__element__remove-button", '\u2716')
-        removeButton.addEventListener('click', (eve) => {
+        const newDiv: HTMLDivElement = createDiv("column__element-data-info");
+        const removeButton: HTMLButtonElement = renderButton("column__element__remove-button", '\u2716')
+        removeButton.addEventListener('click', (): void => {
             deleteItemFromAllContats(allContacts[char.toLowerCase()], obj.name, obj.vacancy, obj.phone, "name", "vacancy", "phone",`${reduceSpaces(obj.name)}${reduceSpaces(obj.vacancy)}${reduceSpaces(obj.phone)}`)
         })
         renderContact(newDiv, obj)
@@ -227,7 +227,7 @@ function renderColumn(char: string, column: HTMLDivElement) {
     })
 }
 
-function renderAllColumns() {
+function renderAllColumns(): void {
     Object.keys(allContacts).forEach(key => {
         const renderedDiv: divToRender = document.querySelector(`[data-id="${key}"]`)
         if (renderedDiv) {
@@ -237,7 +237,7 @@ function renderAllColumns() {
 }
 
 // render all contacts in one div
-function renderAllToDiv(targetDiv) {
+function renderAllToDiv(targetDiv: HTMLDivElement): void {
 
     Object.keys(allContacts).forEach((key) => {
         if (allContacts[key].length == 0) {return}
@@ -247,33 +247,40 @@ function renderAllToDiv(targetDiv) {
 }
 
 // deletes item from array using filter and replaces old array with new array
-function deleteItemFromAllContats(arr, prop1, prop2, prop3, removeBy1, removeBy2, removeBy3, setValue) {
-    newArr = arr.filter(item => !(item[removeBy1] === prop1 && item[removeBy2] === prop2 && item[removeBy3] === prop3))
+function deleteItemFromAllContats(arr: contact[], prop1: string, prop2: string, prop3: string, removeBy1: string, removeBy2: string, removeBy3: string, setValue: string): void {
+    const newArr: contact[] = arr.filter(item => !(item[removeBy1] === prop1 && item[removeBy2] === prop2 && item[removeBy3] === prop3))
     allContacts[prop1[0].toLowerCase()] = newArr
     existingContacts.delete(setValue)
     localStorage.removeItem(`${prop1}${prop2}${prop3}`)
-    renderColumn(prop1[0].toLowerCase(), document.querySelector(`[data-id="${prop1[0].toLowerCase()}"]`))
-}
-
-
-function toggleContacts(event) {
-    
-    let column = event.target.closest("div");
-    if (!column) return;
-    if (!column.classList.contains("element__letter")) return;
-    let displayedContacts = column.children
-    for (contact of displayedContacts) {
-        contact.classList.toggle("column__element-data-info-shown")
+    const renderedDiv: divToRender = document.querySelector(`[data-id="${prop1[0].toLowerCase()}"]`)
+    if (renderedDiv) {
+        renderColumn(prop1[0].toLowerCase(), renderedDiv)
     }
 }
 
 
+function toggleContacts(event: MouseEvent) {
+    const target = event.target as Element;
+    const closestDiv: HTMLDivElement | null = target.closest("div")
+    if (closestDiv) {
+        let column: HTMLDivElement = closestDiv;
+        if (!column) return;
+        if (!column.classList.contains("element__letter")) return;
+        let displayedContacts = column.children
+        for (const contactDiv of displayedContacts) {
+            contactDiv.classList.toggle("column__element-data-info-shown")
+        }
+    }
+    
+}
 
 
 
 
-function renderButton(className, text) {
-    const button = document.createElement('button')
+
+
+function renderButton(className: string, text: string): HTMLButtonElement {
+    const button: HTMLButtonElement = document.createElement('button')
     button.classList.add(className)
     button.innerText = text
     return button;
