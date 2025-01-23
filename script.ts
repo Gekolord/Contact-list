@@ -7,9 +7,7 @@ interface allContacts {
 }
 
 interface timers {
-    nameTimer: undefined | number;
-    vacancyTimer: undefined | number;
-    phoneTimer: undefined | number;
+    [key: string]: undefined | number
 }
 
 const allContacts: allContacts = {
@@ -288,39 +286,39 @@ function renderButton(className: string, text: string): HTMLButtonElement {
 
 
 // returns true if a string contains non english letters, excluding spaces
-function checkForNonEnglishLetters(str) {
+function checkForNonEnglishLetters(str: string): boolean {
     const nonEnglishPattern = /[^a-zA-Z\s]/;
     return nonEnglishPattern.test(str);
 }
 // return true if str is shorter than num symbols
-function checkShortLength(str, num) {
+function checkShortLength(str: string, num: number): boolean {
     return reduceSpaces(str.trim()).length < num
 }
 
 // return true if str is longer than num symbols
-function checkLongLength(str, num) {
+function checkLongLength(str: string, num: number): boolean {
     return reduceSpaces(str.trim()).length > num
 }
 
 // return true if str is empty
-function checkForEmpty(str) {
-    return !str.trim()
+function checkForEmpty(str: string): boolean {
+    return str.trim().length === 0
 }
 
 // return true if str doesnt start with +
-function checkIfDoesntStartsWithPlus(str) {
+function checkIfDoesntStartsWithPlus(str: string): boolean {
     const startsWithPlus = /^\+/;
     return !startsWithPlus.test(str.trim())
 }
 
 // return true if str contains non numeric chars or spaces inside of it, but allows + at the beginning
-function checkForNonNumeric(str) {
+function checkForNonNumeric(str: string): boolean {
     const containsNonNumeric = /^\+?[\d]*$/;
     return !containsNonNumeric.test(str.trim());
 }
 
 // checks phone number for all mistakes, returns true if theres any
-function checkPhoneNumber(str) {
+function checkPhoneNumber(str: string): boolean {
     return checkForEmpty(str) || 
            checkIfDoesntStartsWithPlus(str) ||
            checkForNonNumeric(str) || 
@@ -330,7 +328,7 @@ function checkPhoneNumber(str) {
 }
 
 // checks name or vacancy for all mistakes, returns true if theres any
-function checkNameOrVacancy(str) {
+function checkNameOrVacancy(str: string): boolean {
     return checkForEmpty(str) || 
            checkForNonEnglishLetters(str) || 
            checkLongLength(str, 15) || 
@@ -339,7 +337,7 @@ function checkNameOrVacancy(str) {
 }
 // displays errorMessage within targetNode for 6 seconds 
 // if error is displayed while its clicked, removes the class, cancels animation and adds class immediatly
-function displayError(targetNode, errorMessage, timerVariable) {
+function displayError(targetNode: HTMLSpanElement, errorMessage: string, timerVariable: string): void {
     if (targetNode.classList.contains("error-message_visible")) {
         targetNode.innerText = errorMessage;
         targetNode.classList.remove("error-message_visible")
@@ -360,8 +358,8 @@ function displayError(targetNode, errorMessage, timerVariable) {
     }
 }
 // checks if name input has errors and renders necessary error message
-function validateNameInputAndRenderErrors() {
-    let str = nameInput.value
+function validateNameInputAndRenderErrors(): boolean {
+    let str: string = nameInput.value
     if (checkNameOrVacancy(str)) {
         if (checkForEmpty(str)) {
             displayError(nameErrorNode, "Must not contain empty string.", "nameTimer")
@@ -384,8 +382,8 @@ function validateNameInputAndRenderErrors() {
 }
 
 // checks if vacancy input has errors and renders necessary error message
-function validateVacancyInputAndRenderErrors() {
-    let str = vacancyInput.value
+function validateVacancyInputAndRenderErrors(): boolean {
+    let str: string = vacancyInput.value
     if (checkNameOrVacancy(str)) {
         if (checkForEmpty(str)) {
             displayError(vacancyErrorNode, "Must not contain empty string.", "vacancyTimer")
@@ -408,8 +406,8 @@ function validateVacancyInputAndRenderErrors() {
 }
 
 // checks if phone input has errors and renders necessary error message
-function validatePhoneInputAndRenderErrors() {
-    let str = phoneInput.value
+function validatePhoneInputAndRenderErrors(): boolean {
+    let str: string = phoneInput.value
     if (checkPhoneNumber(str)) {
         if (checkForEmpty(str)) {
             displayError(phoneErrorNode, "Must not contain empty string.", "phoneTimer")
@@ -435,7 +433,7 @@ function validatePhoneInputAndRenderErrors() {
 }
 
 // checks if all inputs have errors and renders necessary error messages
-function validateAllInputsAndRenderErrors() {
+function validateAllInputsAndRenderErrors(): boolean {
     if (validateNameInputAndRenderErrors()    ||
         validatePhoneInputAndRenderErrors()   ||
         validateVacancyInputAndRenderErrors() ||
@@ -449,37 +447,31 @@ function validateAllInputsAndRenderErrors() {
     return false;
 }
 // stores one object in local storage
-function storeOneInLocalStorage(obj) {
-    const dataString = JSON.stringify(obj)
-    const storeKey = `${obj.name}${obj.vacancy}${obj.phone}`
+function storeOneInLocalStorage(obj: contact) {
+    const dataString: string = JSON.stringify(obj)
+    const storeKey: string = `${obj.name}${obj.vacancy}${obj.phone}`
     localStorage.setItem(storeKey, dataString)
     console.log(localStorage)
 }
 
 // retrieves one object from local storage
-function retrieveOneFromLocalStorage(key) {
-    const retrievedDataString = localStorage.getItem(key);
+function retrieveOneFromLocalStorage(key: string): string | void {
+
+    const retrievedDataString: string | null = localStorage.getItem(key);
     if (retrievedDataString) {
         const retrievedData = JSON.parse(retrievedDataString);
         return retrievedData;
     }
 }
-// retrieves all objects from localstorage and stores it in object
-function retrieveAllFromLocalStorage() {
-    let returnObj = {}
-    for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i);
-        returnObj[key] = retrieveAllFromLocalStorage(key)
-    }
-    return returnObj;
-}
 
 // writes from local storage to allContacts and existingContacts
-function loadFromLocalStorage() {
+function loadFromLocalStorage(): void {
     for (let i = 0; i < localStorage.length; i++) {
-        const key = localStorage.key(i)
-        existingContacts.add(key)
-        allContacts[key[0]].push(retrieveOneFromLocalStorage(key))
+        const key: string | null = localStorage.key(i)
+        if (key) {
+            existingContacts.add(key)
+            allContacts[key[0]].push(retrieveOneFromLocalStorage(key))
+        }
     }
 }
 
