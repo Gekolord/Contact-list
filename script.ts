@@ -60,6 +60,7 @@ let searchWindowOutput = document.querySelector(".search-window__output") as HTM
 let searchInput = document.querySelector(".search-window__input") as HTMLInputElement
 
 type divToRender = HTMLDivElement | null
+let showallButtonPressed: boolean = false
 
 const timers: timers = {
     nameTimer: undefined,
@@ -88,25 +89,28 @@ addButton.addEventListener("click", function(): void | boolean {
 
 
 searchInput.addEventListener("input", (): void => {
-        if (!searchInput!.value) {
-            searchWindowOutput!.innerHTML = ""
-            return;
-        };
+    showallButtonPressed = false
+    if (!searchInput!.value) {
         searchWindowOutput!.innerHTML = ""
-        renderArrToDiv(
-            searchByName(allContacts[searchInput!.value[0].toLowerCase()], searchInput!.value),
-            searchWindowOutput,
-            "search-window__output-data-info",
-            "search-window__output-data-info__remove-button"
-        )
-    })
+        return;
+    };
+    searchWindowOutput!.innerHTML = ""
+    renderArrToDiv(
+        searchByName(allContacts[searchInput!.value[0].toLowerCase()], searchInput!.value),
+        searchWindowOutput,
+        "search-window__output-data-info",
+        "search-window__output-data-info__remove-button"
+    )
+})
 
 
 showAllButton!.addEventListener("click", (): void => {
+    showallButtonPressed = true
     searchInput!.value = ""
     searchWindowOutput!.innerHTML = ""
     renderAllToDiv(searchWindowOutput)
     searchWindowOutput!.classList.add("search-window__output-info-shown")
+    
 })
 
 contactTable!.addEventListener("click", toggleContacts)
@@ -123,6 +127,7 @@ searchButton!.addEventListener("click", (): void => {
 })
 
 searchWindowCloseButton.addEventListener("click", (): void => {
+    showallButtonPressed = false
     if (searchWindow.classList.contains("seach-window_active")) {
         searchWindow.classList.remove("seach-window_active")
         searchWindowOutput.classList.remove("search-window__output-info-shown")
@@ -278,7 +283,7 @@ function toggleContacts(event: MouseEvent) {
 }
 
 
-
+// changes the given contact object and returns 
 
 
 

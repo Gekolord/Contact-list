@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="/style.css">
 </head>
 <body>
+
     <div class=""></div>
     <div class="wrapper">
         <h1 class="main-title">Contact List</h1>
@@ -69,13 +70,31 @@
                     <div class="column__element element"><div data-id="z" class="element__letter js-column-letter">Z</div></div>                    
             </div>
         </div>
-        <div class="search-window search-window-wrapper seach-window_active">
+        <div class="search-window search-window-wrapper">
             <div class="search-window-main ">
-                <h1>Search contact</h1>
+                <h1>Search contacts</h1>
                 <input type="text" placeholder="Search..." class="search-window__input">
                 <div class="search-window__output"></div>
                 <input type="submit" class="search-window__show-all" value="Show all">
                 <input type="submit" class="search-window__close-window" value="✖">
+            </div>
+        </div>
+        <div class="edit-window edit-window-wrapper edit-window_active">
+            <div class="edit-window-main">
+                <h1>Edit contact</h1>
+                <div class="input-wrapper">
+                    <label for="changeName">Name:</label>
+                    <input type="text" id="changeName" placeholder="Write new name...">
+                </div>
+                <div class="input-wrapper">
+                    <label for="changeVacancy">Vacancy:</label>
+                    <input type="text" id="changeVacancy" placeholder="Write new vacancy...">
+                </div>
+                <div class="input-wrapper">
+                    <label for="changePhone">Phone:</label>
+                    <input type="text" id="changePhone" placeholder="Write new phone...">
+                </div>
+
             </div>
         </div>
     </div>
