@@ -60,10 +60,13 @@ let searchWindowOutput = document.querySelector(".search-window__output") as HTM
 let searchInput = document.querySelector(".search-window__input") as HTMLInputElement
 let editWindow = document.querySelector(".edit-window") as HTMLDivElement
 let editCloseButton = document.querySelector(".edit-window__close-window") as HTMLInputElement
-let editApplyChangesButton = document.querySelector(".edit-window__apply-changes-button")
+let editApplyChangesButton = document.querySelector(".edit-window__apply-changes-button") as HTMLInputElement
 let editInputName = document.querySelector(".edit-window__input-name") as HTMLInputElement
 let editInputVacancy = document.querySelector(".edit-window__input-vacancy") as HTMLInputElement
 let editInputPhone = document.querySelector(".edit-window__input-phone") as HTMLInputElement
+let editNameErrorNode = document.querySelector(".error-message__edit-name-error") as HTMLSpanElement
+let editVacancyErrorNode = document.querySelector(".error-message__edit-vacancy-error") as HTMLSpanElement
+let editPhoneErrorNode = document.querySelector(".error-message__edit-phone-error") as HTMLSpanElement
 
 type divToRender = HTMLDivElement | null
 
@@ -90,6 +93,11 @@ editCloseButton.addEventListener("click", () => {
     editWindow.classList.remove("edit-window_active")
 })
 
+editApplyChangesButton.addEventListener("click", () => {
+    if (validateAllInputsAndRenderErrors(editInputName, editInputVacancy, editInputPhone, editNameErrorNode, editVacancyErrorNode, editPhoneErrorNode)) {
+        return;
+    }
+})
 
 addButton.addEventListener("click", function(): void | boolean {
     if (validateAllInputsAndRenderErrors(nameInput, vacancyInput, phoneInput, nameErrorNode, vacancyErrorNode, phoneErrorNode)) {
@@ -382,8 +390,8 @@ function checkPhoneNumber(str: string): boolean {
            checkIfDoesntStartsWithPlus(str) ||
            checkForNonNumeric(str) || 
            checkShortLength(str, 5) || 
-           checkLongLength(str, 18) ||
-           checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`));
+           checkLongLength(str, 18) 
+        //    checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`));
 }
 
 // checks name or vacancy for all mistakes, returns true if theres any
@@ -391,8 +399,8 @@ function checkNameOrVacancy(str: string): boolean {
     return checkForEmpty(str) || 
            checkForNonEnglishLetters(str) || 
            checkLongLength(str, 15) || 
-           checkShortLength(str, 3) ||
-           checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`));
+           checkShortLength(str, 3) 
+        //    checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`));
 }
 // displays errorMessage within targetNode for 6 seconds 
 // if error is displayed while its clicked, removes the class, cancels animation and adds class immediatly
@@ -417,8 +425,8 @@ function displayError(targetNode: HTMLSpanElement, errorMessage: string, timerVa
     }
 }
 // checks if name input has errors and renders necessary error message
-function validateNameInputAndRenderErrors(inputField: HTMLInputElement, errorNode: HTMLSpanElement): boolean {
-    let str: string = inputField.value
+function validateNameInputAndRenderErrors(inputNameField: HTMLInputElement, errorNode: HTMLSpanElement): boolean {
+    let str: string = inputNameField.value
     if (checkNameOrVacancy(str)) {
         if (checkForEmpty(str)) {
             displayError(errorNode, "Must not contain empty string.", "nameTimer")
@@ -432,17 +440,18 @@ function validateNameInputAndRenderErrors(inputField: HTMLInputElement, errorNod
         } else if (checkShortLength(str, 3)) {
             displayError(errorNode, "Must not be shorter than 3 symbols.", "nameTimer")
             return true
-        } else if (checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`))) {
-            displayError(errorNode, "Cannot add existing contact", "nameTimer")
-            return true
-        }
+        } 
+        // else if (checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`))) {
+        //     displayError(errorNode, "Cannot add existing contact", "nameTimer")
+        //     return true
+        // }
     }
     return false;
 }
 
 // checks if vacancy input has errors and renders necessary error message
-function validateVacancyInputAndRenderErrors(inputField: HTMLInputElement, errorNode: HTMLSpanElement): boolean {
-    let str: string = inputField.value
+function validateVacancyInputAndRenderErrors(inputNameField: HTMLInputElement, errorNode: HTMLSpanElement): boolean {
+    let str: string = inputNameField.value
     if (checkNameOrVacancy(str)) {
         if (checkForEmpty(str)) {
             displayError(errorNode, "Must not contain empty string.", "vacancyTimer")
@@ -456,17 +465,18 @@ function validateVacancyInputAndRenderErrors(inputField: HTMLInputElement, error
         } else if (checkShortLength(str, 3)) {
             displayError(errorNode, "Must not be shorter than 3 symbols.", "vacancyTimer")
             return true
-        } else if (checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`))) {
-            displayError(errorNode, "Cannot add existing contact", "vacancyTimer")
-            return true
-        }
+        } 
+        // else if (checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`))) {
+        //     displayError(errorNode, "Cannot add existing contact", "vacancyTimer")
+        //     return true
+        // }
     }
     return false;
 }
 
 // checks if phone input has errors and renders necessary error message
-function validatePhoneInputAndRenderErrors(inputField: HTMLInputElement, errorNode: HTMLSpanElement): boolean {
-    let str: string = inputField.value
+function validatePhoneInputAndRenderErrors(inputNameField: HTMLInputElement, errorNode: HTMLSpanElement): boolean {
+    let str: string = inputNameField.value
     if (checkPhoneNumber(str)) {
         if (checkForEmpty(str)) {
             displayError(errorNode, "Must not contain empty string.", "phoneTimer")
@@ -483,13 +493,29 @@ function validatePhoneInputAndRenderErrors(inputField: HTMLInputElement, errorNo
         } else if (checkLongLength(str, 18)) {
             displayError(errorNode, "Must not be longer that 18 symbols.", "phoneTimer")
             return true;
-        } else if (checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`))) {
-            displayError(errorNode, "Cannot add existing contact", "phoneTimer")
-            return true;
-        }
+        } 
+        // else if (checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`))) {
+        //     displayError(errorNode, "Cannot add existing contact", "phoneTimer")
+        //     return true;
+        // }
     }
     return false;
 }
+
+// new function to render a specific error if 3 inputs match the exact values of already existing contact
+function checkExistingContactAndRenderError(
+    nameInputElement: HTMLInputElement, 
+    vacancyInputElement: HTMLInputElement,
+    phoneInputElement: HTMLInputElement,
+    nameErrorContainer: HTMLSpanElement,
+    vacancyErrorContainer: HTMLSpanElement,
+    phoneErrorContainer: HTMLSpanElement) {
+        if (checkExistingContact(reduceSpaces(`${reduceSpaces(nameInputElement.value)}${reduceSpaces(vacancyInputElement.value)}${reduceSpaces(phoneInputElement.value)}`))) {
+            displayError(nameErrorContainer, "Cannot add existing contact", "nameTimer")
+            displayError(vacancyErrorContainer, "Cannot add existing contact", "vacancyTimer")
+            displayError(phoneErrorContainer, "Cannot add existing contact", "phoneTimer")
+        }
+    }
 
 // checks if all inputs have errors and renders necessary error messages
 // now that i look at it i question why i made it this way 2 months ago
@@ -507,6 +533,7 @@ function validateAllInputsAndRenderErrors(nameInputElement: HTMLInputElement,
             validateNameInputAndRenderErrors(nameInputElement, nameErrorContainer) 
             validatePhoneInputAndRenderErrors(phoneInputElement, phoneErrorContainer) 
             validateVacancyInputAndRenderErrors(vacancyInputElement, vacancyErrorContainer)
+            checkExistingContactAndRenderError(nameInputElement, vacancyInputElement, phoneInputElement, nameErrorContainer, vacancyErrorContainer, phoneErrorContainer)
             return true
         }
     return false;

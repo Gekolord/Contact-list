@@ -48,6 +48,9 @@ let editApplyChangesButton = document.querySelector(".edit-window__apply-changes
 let editInputName = document.querySelector(".edit-window__input-name");
 let editInputVacancy = document.querySelector(".edit-window__input-vacancy");
 let editInputPhone = document.querySelector(".edit-window__input-phone");
+let editNameErrorNode = document.querySelector(".error-message__edit-name-error");
+let editVacancyErrorNode = document.querySelector(".error-message__edit-vacancy-error");
+let editPhoneErrorNode = document.querySelector(".error-message__edit-phone-error");
 const temporaryContact = {
     name: "",
     vacancy: "",
@@ -66,6 +69,11 @@ window.addEventListener("load", () => {
 });
 editCloseButton.addEventListener("click", () => {
     editWindow.classList.remove("edit-window_active");
+});
+editApplyChangesButton.addEventListener("click", () => {
+    if (validateAllInputsAndRenderErrors(editInputName, editInputVacancy, editInputPhone, editNameErrorNode, editVacancyErrorNode, editPhoneErrorNode)) {
+        return;
+    }
 });
 addButton.addEventListener("click", function () {
     if (validateAllInputsAndRenderErrors(nameInput, vacancyInput, phoneInput, nameErrorNode, vacancyErrorNode, phoneErrorNode)) {
@@ -313,16 +321,16 @@ function checkPhoneNumber(str) {
         checkIfDoesntStartsWithPlus(str) ||
         checkForNonNumeric(str) ||
         checkShortLength(str, 5) ||
-        checkLongLength(str, 18) ||
-        checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`));
+        checkLongLength(str, 18);
+    //    checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`));
 }
 // checks name or vacancy for all mistakes, returns true if theres any
 function checkNameOrVacancy(str) {
     return checkForEmpty(str) ||
         checkForNonEnglishLetters(str) ||
         checkLongLength(str, 15) ||
-        checkShortLength(str, 3) ||
-        checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`));
+        checkShortLength(str, 3);
+    //    checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`));
 }
 // displays errorMessage within targetNode for 6 seconds 
 // if error is displayed while its clicked, removes the class, cancels animation and adds class immediatly
@@ -346,8 +354,8 @@ function displayError(targetNode, errorMessage, timerVariable) {
     }
 }
 // checks if name input has errors and renders necessary error message
-function validateNameInputAndRenderErrors(inputField, errorNode) {
-    let str = inputField.value;
+function validateNameInputAndRenderErrors(inputNameField, errorNode) {
+    let str = inputNameField.value;
     if (checkNameOrVacancy(str)) {
         if (checkForEmpty(str)) {
             displayError(errorNode, "Must not contain empty string.", "nameTimer");
@@ -365,16 +373,16 @@ function validateNameInputAndRenderErrors(inputField, errorNode) {
             displayError(errorNode, "Must not be shorter than 3 symbols.", "nameTimer");
             return true;
         }
-        else if (checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`))) {
-            displayError(errorNode, "Cannot add existing contact", "nameTimer");
-            return true;
-        }
+        // else if (checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`))) {
+        //     displayError(errorNode, "Cannot add existing contact", "nameTimer")
+        //     return true
+        // }
     }
     return false;
 }
 // checks if vacancy input has errors and renders necessary error message
-function validateVacancyInputAndRenderErrors(inputField, errorNode) {
-    let str = inputField.value;
+function validateVacancyInputAndRenderErrors(inputNameField, errorNode) {
+    let str = inputNameField.value;
     if (checkNameOrVacancy(str)) {
         if (checkForEmpty(str)) {
             displayError(errorNode, "Must not contain empty string.", "vacancyTimer");
@@ -392,16 +400,16 @@ function validateVacancyInputAndRenderErrors(inputField, errorNode) {
             displayError(errorNode, "Must not be shorter than 3 symbols.", "vacancyTimer");
             return true;
         }
-        else if (checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`))) {
-            displayError(errorNode, "Cannot add existing contact", "vacancyTimer");
-            return true;
-        }
+        // else if (checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`))) {
+        //     displayError(errorNode, "Cannot add existing contact", "vacancyTimer")
+        //     return true
+        // }
     }
     return false;
 }
 // checks if phone input has errors and renders necessary error message
-function validatePhoneInputAndRenderErrors(inputField, errorNode) {
-    let str = inputField.value;
+function validatePhoneInputAndRenderErrors(inputNameField, errorNode) {
+    let str = inputNameField.value;
     if (checkPhoneNumber(str)) {
         if (checkForEmpty(str)) {
             displayError(errorNode, "Must not contain empty string.", "phoneTimer");
@@ -423,12 +431,20 @@ function validatePhoneInputAndRenderErrors(inputField, errorNode) {
             displayError(errorNode, "Must not be longer that 18 symbols.", "phoneTimer");
             return true;
         }
-        else if (checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`))) {
-            displayError(errorNode, "Cannot add existing contact", "phoneTimer");
-            return true;
-        }
+        // else if (checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`))) {
+        //     displayError(errorNode, "Cannot add existing contact", "phoneTimer")
+        //     return true;
+        // }
     }
     return false;
+}
+// new function to render a specific error if 3 inputs match the exact values of already existing contact
+function checkExistingContactAndRenderError(nameInputElement, vacancyInputElement, phoneInputElement, nameErrorContainer, vacancyErrorContainer, phoneErrorContainer) {
+    if (checkExistingContact(reduceSpaces(`${reduceSpaces(nameInputElement.value)}${reduceSpaces(vacancyInputElement.value)}${reduceSpaces(phoneInputElement.value)}`))) {
+        displayError(nameErrorContainer, "Cannot add existing contact", "nameTimer");
+        displayError(vacancyErrorContainer, "Cannot add existing contact", "vacancyTimer");
+        displayError(phoneErrorContainer, "Cannot add existing contact", "phoneTimer");
+    }
 }
 // checks if all inputs have errors and renders necessary error messages
 // now that i look at it i question why i made it this way 2 months ago
@@ -440,6 +456,7 @@ function validateAllInputsAndRenderErrors(nameInputElement, vacancyInputElement,
         validateNameInputAndRenderErrors(nameInputElement, nameErrorContainer);
         validatePhoneInputAndRenderErrors(phoneInputElement, phoneErrorContainer);
         validateVacancyInputAndRenderErrors(vacancyInputElement, vacancyErrorContainer);
+        checkExistingContactAndRenderError(nameInputElement, vacancyInputElement, phoneInputElement, nameErrorContainer, vacancyErrorContainer, phoneErrorContainer);
         return true;
     }
     return false;
