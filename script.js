@@ -42,6 +42,18 @@ let searchButton = document.querySelector(".form__element-search");
 let showAllButton = document.querySelector(".search-window__show-all");
 let searchWindowOutput = document.querySelector(".search-window__output");
 let searchInput = document.querySelector(".search-window__input");
+let editWindow = document.querySelector(".edit-window");
+let editCloseButton = document.querySelector(".edit-window__close-window");
+let editApplyChangesButton = document.querySelector(".edit-window__apply-changes-button");
+let editInputName = document.querySelector(".edit-window__input-name");
+let editInputVacancy = document.querySelector(".edit-window__input-vacancy");
+let editInputPhone = document.querySelector(".edit-window__input-phone");
+const temporaryContact = {
+    name: "",
+    vacancy: "",
+    phone: ""
+};
+let showallButtonPressed = false;
 const timers = {
     nameTimer: undefined,
     vacancyTimer: undefined,
@@ -52,8 +64,11 @@ window.addEventListener("load", () => {
     loadFromLocalStorage();
     renderAllColumns();
 });
+editCloseButton.addEventListener("click", () => {
+    editWindow.classList.remove("edit-window_active");
+});
 addButton.addEventListener("click", function () {
-    if (validateAllInputsAndRenderErrors()) {
+    if (validateAllInputsAndRenderErrors(nameInput, vacancyInput, phoneInput, nameErrorNode, vacancyErrorNode, phoneErrorNode)) {
         return false;
     }
     else if (!checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`))) {
@@ -67,15 +82,17 @@ addButton.addEventListener("click", function () {
     }
 });
 searchInput.addEventListener("input", () => {
+    showallButtonPressed = false;
     if (!searchInput.value) {
         searchWindowOutput.innerHTML = "";
         return;
     }
     ;
     searchWindowOutput.innerHTML = "";
-    renderArrToDiv(searchByName(allContacts[searchInput.value[0].toLowerCase()], searchInput.value), searchWindowOutput, "search-window__output-data-info", "search-window__output-data-info__remove-button");
+    renderArrToDiv(searchByName(allContacts[searchInput.value[0].toLowerCase()], searchInput.value), searchWindowOutput, "search-window__output-data-info", "search-window__output-data-info__remove-button", "search-window__output-data-info__edit-button");
 });
 showAllButton.addEventListener("click", () => {
+    showallButtonPressed = true;
     searchInput.value = "";
     searchWindowOutput.innerHTML = "";
     renderAllToDiv(searchWindowOutput);
@@ -92,6 +109,7 @@ searchButton.addEventListener("click", () => {
     }
 });
 searchWindowCloseButton.addEventListener("click", () => {
+    showallButtonPressed = false;
     if (searchWindow.classList.contains("seach-window_active")) {
         searchWindow.classList.remove("seach-window_active");
         searchWindowOutput.classList.remove("search-window__output-info-shown");
@@ -101,13 +119,14 @@ searchWindowCloseButton.addEventListener("click", () => {
 });
 // adds person to contacts and returns first letter of their name
 function addPersonToContacts() {
-    let person = Object.fromEntries([
+    const entries = [
         ['name', reduceSpaces(nameInput.value.trim())],
         ['vacancy', reduceSpaces(vacancyInput.value.trim())],
         ['phone', reduceSpaces(phoneInput.value.trim())]
-    ]);
+    ];
+    let person = Object.fromEntries(entries);
     if (checkExistingContact(reduceSpaces(`${person.name}${person.vacancy}${person.phone}`))) {
-        person = null;
+        // person = null
         return true;
     }
     allContacts[reduceSpaces(nameInput.value.trim())[0].toLowerCase()].push(person);
@@ -143,19 +162,38 @@ function searchByName(array, searchString) {
     const lowerCaseSearchString = searchString.toLowerCase();
     return array.filter(person => person.name.toLowerCase().startsWith(lowerCaseSearchString));
 }
+// writes text into edit fields using values of given object
+function redactEditInputs(obj) {
+    editInputName.value = obj.name;
+    editInputVacancy.value = obj.vacancy;
+    editInputPhone.value = obj.phone;
+}
+// writes values of passed contact object into temporary contact
+function redactTemporaryContact(obj) {
+    temporaryContact.name = obj.name;
+    temporaryContact.vacancy = obj.vacancy;
+    temporaryContact.phone = obj.phone;
+    console.log(temporaryContact);
+}
 // renders array of objects with specified classnames of delete buttons and divs to div
-function renderArrToDiv(arr, targetDiv, contactDivClassName, deleteButtonClassName) {
+function renderArrToDiv(arr, targetDiv, contactDivClassName, deleteButtonClassName, editButtonClassName) {
     if (!arr)
         return;
     // 
     arr.forEach(contact => {
         const newDiv = createDiv(contactDivClassName);
         const removeButton = renderButton(deleteButtonClassName, '\u2716');
+        const editButton = renderButton(editButtonClassName, '\u270E');
+        editButton.addEventListener("click", () => {
+            redactEditInputs(contact);
+            redactTemporaryContact(contact);
+            editWindow.classList.add("edit-window_active");
+        });
         removeButton.addEventListener('click', () => {
             if (searchInput.value.length !== 0) {
                 deleteItemFromAllContats(allContacts[contact.name[0].toLowerCase()], contact.name, contact.vacancy, contact.phone, "name", "vacancy", "phone", `${reduceSpaces(contact.name)}${reduceSpaces(contact.vacancy)}${reduceSpaces(contact.phone)}`);
                 targetDiv.innerHTML = "";
-                renderArrToDiv(searchByName(allContacts[searchInput.value[0].toLowerCase()], searchInput.value), searchWindowOutput, "search-window__output-data-info", "search-window__output-data-info__remove-button");
+                renderArrToDiv(searchByName(allContacts[searchInput.value[0].toLowerCase()], searchInput.value), searchWindowOutput, "search-window__output-data-info", "search-window__output-data-info__remove-button", "search-window__output-data-info__edit-button");
             }
             else {
                 deleteItemFromAllContats(allContacts[contact.name[0].toLowerCase()], contact.name, contact.vacancy, contact.phone, "name", "vacancy", "phone", `${reduceSpaces(contact.name)}${reduceSpaces(contact.vacancy)}${reduceSpaces(contact.phone)}`);
@@ -165,21 +203,29 @@ function renderArrToDiv(arr, targetDiv, contactDivClassName, deleteButtonClassNa
         });
         renderContact(newDiv, contact);
         newDiv.append(removeButton);
+        newDiv.append(editButton);
         targetDiv.append(newDiv);
     });
 }
-// renders all contacts of corresponding letter
+// renders all contacts of corresponding letteraa
 function renderColumn(char, column) {
     // const column = document.querySelector(`[data-id="${char.toLowerCase()}"]`)
     column.innerHTML = `${char.toUpperCase()} - ${allContacts[char.toLowerCase()].length}`;
     allContacts[char.toLowerCase()].forEach((obj) => {
         const newDiv = createDiv("column__element-data-info");
         const removeButton = renderButton("column__element__remove-button", '\u2716');
+        const editButton = renderButton("column__element__edit-button", '\u270E');
+        editButton.addEventListener("click", () => {
+            redactEditInputs(obj);
+            redactTemporaryContact(obj);
+            editWindow.classList.add("edit-window_active");
+        });
         removeButton.addEventListener('click', () => {
             deleteItemFromAllContats(allContacts[char.toLowerCase()], obj.name, obj.vacancy, obj.phone, "name", "vacancy", "phone", `${reduceSpaces(obj.name)}${reduceSpaces(obj.vacancy)}${reduceSpaces(obj.phone)}`);
         });
         renderContact(newDiv, obj);
         newDiv.append(removeButton);
+        newDiv.append(editButton);
         column.append(newDiv);
     });
 }
@@ -198,7 +244,7 @@ function renderAllToDiv(targetDiv) {
             return;
         }
         console.log(key);
-        renderArrToDiv(allContacts[key], targetDiv, "search-window__output-data-info", "search-window__output-data-info__remove-button");
+        renderArrToDiv(allContacts[key], targetDiv, "search-window__output-data-info", "search-window__output-data-info__remove-button", "search-window__output-data-info__edit-button");
     });
 }
 // deletes item from array using filter and replaces old array with new array
@@ -227,6 +273,7 @@ function toggleContacts(event) {
         }
     }
 }
+// changes the given contact object and returns 
 function renderButton(className, text) {
     const button = document.createElement('button');
     button.classList.add(className);
@@ -299,99 +346,100 @@ function displayError(targetNode, errorMessage, timerVariable) {
     }
 }
 // checks if name input has errors and renders necessary error message
-function validateNameInputAndRenderErrors() {
-    let str = nameInput.value;
+function validateNameInputAndRenderErrors(inputField, errorNode) {
+    let str = inputField.value;
     if (checkNameOrVacancy(str)) {
         if (checkForEmpty(str)) {
-            displayError(nameErrorNode, "Must not contain empty string.", "nameTimer");
+            displayError(errorNode, "Must not contain empty string.", "nameTimer");
             return true;
         }
         else if (checkForNonEnglishLetters(str)) {
-            displayError(nameErrorNode, "Must contain only letters from English alphabet.", "nameTimer");
+            displayError(errorNode, "Must contain only letters from English alphabet.", "nameTimer");
             return true;
         }
         else if (checkLongLength(str, 15)) {
-            displayError(nameErrorNode, "Must not be longer than 15 symbols.", "nameTimer");
+            displayError(errorNode, "Must not be longer than 15 symbols.", "nameTimer");
             return true;
         }
         else if (checkShortLength(str, 3)) {
-            displayError(nameErrorNode, "Must not be shorter than 3 symbols.", "nameTimer");
+            displayError(errorNode, "Must not be shorter than 3 symbols.", "nameTimer");
             return true;
         }
         else if (checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`))) {
-            displayError(nameErrorNode, "Cannot add existing contact", "nameTimer");
+            displayError(errorNode, "Cannot add existing contact", "nameTimer");
             return true;
         }
     }
     return false;
 }
 // checks if vacancy input has errors and renders necessary error message
-function validateVacancyInputAndRenderErrors() {
-    let str = vacancyInput.value;
+function validateVacancyInputAndRenderErrors(inputField, errorNode) {
+    let str = inputField.value;
     if (checkNameOrVacancy(str)) {
         if (checkForEmpty(str)) {
-            displayError(vacancyErrorNode, "Must not contain empty string.", "vacancyTimer");
+            displayError(errorNode, "Must not contain empty string.", "vacancyTimer");
             return true;
         }
         else if (checkForNonEnglishLetters(str)) {
-            displayError(vacancyErrorNode, "Must contain only letters from English alphabet.", "vacancyTimer");
+            displayError(errorNode, "Must contain only letters from English alphabet.", "vacancyTimer");
             return true;
         }
         else if (checkLongLength(str, 15)) {
-            displayError(vacancyErrorNode, "Must not be longer than 15 symbols.", "vacancyTimer");
+            displayError(errorNode, "Must not be longer than 15 symbols.", "vacancyTimer");
             return true;
         }
         else if (checkShortLength(str, 3)) {
-            displayError(vacancyErrorNode, "Must not be shorter than 3 symbols.", "vacancyTimer");
+            displayError(errorNode, "Must not be shorter than 3 symbols.", "vacancyTimer");
             return true;
         }
         else if (checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`))) {
-            displayError(vacancyErrorNode, "Cannot add existing contact", "vacancyTimer");
+            displayError(errorNode, "Cannot add existing contact", "vacancyTimer");
             return true;
         }
     }
     return false;
 }
 // checks if phone input has errors and renders necessary error message
-function validatePhoneInputAndRenderErrors() {
-    let str = phoneInput.value;
+function validatePhoneInputAndRenderErrors(inputField, errorNode) {
+    let str = inputField.value;
     if (checkPhoneNumber(str)) {
         if (checkForEmpty(str)) {
-            displayError(phoneErrorNode, "Must not contain empty string.", "phoneTimer");
+            displayError(errorNode, "Must not contain empty string.", "phoneTimer");
             return true;
         }
         else if (checkIfDoesntStartsWithPlus(str)) {
-            displayError(phoneErrorNode, "Must start with plus.", "phoneTimer");
+            displayError(errorNode, "Must start with plus.", "phoneTimer");
             return true;
         }
         else if (checkForNonNumeric(str)) {
-            displayError(phoneErrorNode, "Must contain only numbers, no spaces and only one plus at the beginning.", "phoneTimer");
+            displayError(errorNode, "Must contain only numbers, no spaces and only one plus at the beginning.", "phoneTimer");
             return true;
         }
         else if (checkShortLength(str, 5)) {
-            displayError(phoneErrorNode, "Must not be shorter than 5 symbols.", "phoneTimer");
+            displayError(errorNode, "Must not be shorter than 5 symbols.", "phoneTimer");
             return true;
         }
         else if (checkLongLength(str, 18)) {
-            displayError(phoneErrorNode, "Must not be longer that 18 symbols.", "phoneTimer");
+            displayError(errorNode, "Must not be longer that 18 symbols.", "phoneTimer");
             return true;
         }
         else if (checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`))) {
-            displayError(phoneErrorNode, "Cannot add existing contact", "phoneTimer");
+            displayError(errorNode, "Cannot add existing contact", "phoneTimer");
             return true;
         }
     }
     return false;
 }
 // checks if all inputs have errors and renders necessary error messages
-function validateAllInputsAndRenderErrors() {
-    if (validateNameInputAndRenderErrors() ||
-        validatePhoneInputAndRenderErrors() ||
-        validateVacancyInputAndRenderErrors() ||
-        checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`))) {
-        validateNameInputAndRenderErrors();
-        validatePhoneInputAndRenderErrors();
-        validateVacancyInputAndRenderErrors();
+// now that i look at it i question why i made it this way 2 months ago
+function validateAllInputsAndRenderErrors(nameInputElement, vacancyInputElement, phoneInputElement, nameErrorContainer, vacancyErrorContainer, phoneErrorContainer) {
+    if (validateNameInputAndRenderErrors(nameInputElement, nameErrorContainer) ||
+        validatePhoneInputAndRenderErrors(phoneInputElement, phoneErrorContainer) ||
+        validateVacancyInputAndRenderErrors(vacancyInputElement, vacancyErrorContainer) ||
+        checkExistingContact(reduceSpaces(`${reduceSpaces(nameInputElement.value)}${reduceSpaces(vacancyInputElement.value)}${reduceSpaces(phoneInputElement.value)}`))) {
+        validateNameInputAndRenderErrors(nameInputElement, nameErrorContainer);
+        validatePhoneInputAndRenderErrors(phoneInputElement, phoneErrorContainer);
+        validateVacancyInputAndRenderErrors(vacancyInputElement, vacancyErrorContainer);
         return true;
     }
     return false;

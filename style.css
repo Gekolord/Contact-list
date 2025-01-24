@@ -125,7 +125,7 @@
 .edit-window-wrapper {
     position: fixed;
     width: 350px;
-    height: 500px;
+    height: 530px;
     top: 25vh;
     left: 0;
     right: 0;
@@ -142,6 +142,11 @@
 .input-wrapper {
     display: flex;
     flex-direction: column;
+    width: 80%;
+}
+.edit-window-button-wrapper {
+    display: flex;
+    justify-content: space-between;
     width: 80%;
 }
 
@@ -169,4 +174,5 @@
     position: absolute;
     top: 4%;
     left: 92%;
+    
 }

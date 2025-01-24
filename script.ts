@@ -58,8 +58,20 @@ let searchButton = document.querySelector(".form__element-search") as HTMLInputE
 let showAllButton = document.querySelector(".search-window__show-all") as HTMLInputElement
 let searchWindowOutput = document.querySelector(".search-window__output") as HTMLDivElement
 let searchInput = document.querySelector(".search-window__input") as HTMLInputElement
+let editWindow = document.querySelector(".edit-window") as HTMLDivElement
+let editCloseButton = document.querySelector(".edit-window__close-window") as HTMLInputElement
+let editApplyChangesButton = document.querySelector(".edit-window__apply-changes-button")
+let editInputName = document.querySelector(".edit-window__input-name") as HTMLInputElement
+let editInputVacancy = document.querySelector(".edit-window__input-vacancy") as HTMLInputElement
+let editInputPhone = document.querySelector(".edit-window__input-phone") as HTMLInputElement
 
 type divToRender = HTMLDivElement | null
+
+const temporaryContact: contact = {
+    name: "",
+    vacancy: "",
+    phone: ""
+} 
 let showallButtonPressed: boolean = false
 
 const timers: timers = {
@@ -74,8 +86,13 @@ window.addEventListener("load", (): void => {
 
 })
 
+editCloseButton.addEventListener("click", () => {
+    editWindow.classList.remove("edit-window_active")
+})
+
+
 addButton.addEventListener("click", function(): void | boolean {
-    if (validateAllInputsAndRenderErrors()) {
+    if (validateAllInputsAndRenderErrors(nameInput, vacancyInput, phoneInput, nameErrorNode, vacancyErrorNode, phoneErrorNode)) {
         return false;
     } else if (!checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput!.value)}${reduceSpaces(vacancyInput!.value)}${reduceSpaces(phoneInput!.value)}`))) {
         addPersonToContacts()
@@ -99,7 +116,8 @@ searchInput.addEventListener("input", (): void => {
         searchByName(allContacts[searchInput!.value[0].toLowerCase()], searchInput!.value),
         searchWindowOutput,
         "search-window__output-data-info",
-        "search-window__output-data-info__remove-button"
+        "search-window__output-data-info__remove-button",
+        "search-window__output-data-info__edit-button"
     )
 })
 
@@ -189,17 +207,38 @@ function searchByName(array: contact[], searchString: string): contact[] | void 
     );
 }
 
+// writes text into edit fields using values of given object
+function redactEditInputs(obj: contact): void {
+    editInputName.value = obj.name
+    editInputVacancy.value = obj.vacancy
+    editInputPhone.value = obj.phone
+} 
+// writes values of passed contact object into temporary contact
+function redactTemporaryContact(obj: contact): void {
+    temporaryContact.name = obj.name
+    temporaryContact.vacancy = obj.vacancy
+    temporaryContact.phone = obj.phone
+    console.log(temporaryContact)
+}
+
 // renders array of objects with specified classnames of delete buttons and divs to div
 function renderArrToDiv(
     arr: contact[] | void, 
     targetDiv: HTMLDivElement, 
     contactDivClassName: string, 
-    deleteButtonClassName: string): void {
+    deleteButtonClassName: string,
+    editButtonClassName: string): void {
     if (!arr) return;
     // 
     arr.forEach(contact => {
         const newDiv: HTMLDivElement = createDiv(contactDivClassName)
         const removeButton: HTMLButtonElement = renderButton(deleteButtonClassName, '\u2716')
+        const editButton: HTMLButtonElement = renderButton(editButtonClassName, '\u270E')
+        editButton.addEventListener("click", (): void => {
+            redactEditInputs(contact);
+            redactTemporaryContact(contact)
+            editWindow.classList.add("edit-window_active")
+        })
         removeButton.addEventListener('click', (): void => {
             if (searchInput.value.length !== 0) {
                 deleteItemFromAllContats(allContacts[contact.name[0].toLowerCase()], contact.name, contact.vacancy, contact.phone, "name", "vacancy", "phone",`${reduceSpaces(contact.name)}${reduceSpaces(contact.vacancy)}${reduceSpaces(contact.phone)}`)
@@ -207,7 +246,8 @@ function renderArrToDiv(
                 renderArrToDiv(searchByName(allContacts[searchInput.value[0].toLowerCase()], searchInput.value),
                     searchWindowOutput,
                     "search-window__output-data-info",
-                    "search-window__output-data-info__remove-button")
+                    "search-window__output-data-info__remove-button",
+                    "search-window__output-data-info__edit-button")
             }
             else {deleteItemFromAllContats(allContacts[contact.name[0].toLowerCase()], contact.name, contact.vacancy, contact.phone, "name", "vacancy", "phone",`${reduceSpaces(contact.name)}${reduceSpaces(contact.vacancy)}${reduceSpaces(contact.phone)}`)
             targetDiv.innerHTML = ""
@@ -215,22 +255,31 @@ function renderArrToDiv(
         })
         renderContact(newDiv, contact)
         newDiv.append(removeButton)
+        newDiv.append(editButton)
         targetDiv.append(newDiv)
     })
 }
 
-// renders all contacts of corresponding letter
+// renders all contacts of corresponding letteraa
 function renderColumn(char: string, column: HTMLDivElement): void {
     // const column = document.querySelector(`[data-id="${char.toLowerCase()}"]`)
     column.innerHTML = `${char.toUpperCase()} - ${allContacts[char.toLowerCase()].length}`
     allContacts[char.toLowerCase()].forEach((obj) => {
         const newDiv: HTMLDivElement = createDiv("column__element-data-info");
         const removeButton: HTMLButtonElement = renderButton("column__element__remove-button", '\u2716')
+         const editButton: HTMLButtonElement = renderButton("column__element__edit-button", '\u270E')
+        editButton.addEventListener("click", (): void => {
+            redactEditInputs(obj);
+            redactTemporaryContact(obj)
+            editWindow.classList.add("edit-window_active")
+
+        })
         removeButton.addEventListener('click', (): void => {
             deleteItemFromAllContats(allContacts[char.toLowerCase()], obj.name, obj.vacancy, obj.phone, "name", "vacancy", "phone",`${reduceSpaces(obj.name)}${reduceSpaces(obj.vacancy)}${reduceSpaces(obj.phone)}`)
         })
         renderContact(newDiv, obj)
         newDiv.append(removeButton)
+        newDiv.append(editButton)
         column.append(newDiv)
     })
 }
@@ -250,7 +299,7 @@ function renderAllToDiv(targetDiv: HTMLDivElement): void {
     Object.keys(allContacts).forEach((key) => {
         if (allContacts[key].length == 0) {return}
         console.log(key)
-        renderArrToDiv(allContacts[key], targetDiv, "search-window__output-data-info", "search-window__output-data-info__remove-button")
+        renderArrToDiv(allContacts[key], targetDiv, "search-window__output-data-info", "search-window__output-data-info__remove-button", "search-window__output-data-info__edit-button")
     })
 }
 
@@ -368,23 +417,23 @@ function displayError(targetNode: HTMLSpanElement, errorMessage: string, timerVa
     }
 }
 // checks if name input has errors and renders necessary error message
-function validateNameInputAndRenderErrors(): boolean {
-    let str: string = nameInput.value
+function validateNameInputAndRenderErrors(inputField: HTMLInputElement, errorNode: HTMLSpanElement): boolean {
+    let str: string = inputField.value
     if (checkNameOrVacancy(str)) {
         if (checkForEmpty(str)) {
-            displayError(nameErrorNode, "Must not contain empty string.", "nameTimer")
+            displayError(errorNode, "Must not contain empty string.", "nameTimer")
             return true;
         } else if (checkForNonEnglishLetters(str)) {
-            displayError(nameErrorNode, "Must contain only letters from English alphabet.", "nameTimer")
+            displayError(errorNode, "Must contain only letters from English alphabet.", "nameTimer")
             return true
         } else if (checkLongLength(str, 15)) {
-            displayError(nameErrorNode, "Must not be longer than 15 symbols.", "nameTimer")
+            displayError(errorNode, "Must not be longer than 15 symbols.", "nameTimer")
             return true
         } else if (checkShortLength(str, 3)) {
-            displayError(nameErrorNode, "Must not be shorter than 3 symbols.", "nameTimer")
+            displayError(errorNode, "Must not be shorter than 3 symbols.", "nameTimer")
             return true
         } else if (checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`))) {
-            displayError(nameErrorNode, "Cannot add existing contact", "nameTimer")
+            displayError(errorNode, "Cannot add existing contact", "nameTimer")
             return true
         }
     }
@@ -392,23 +441,23 @@ function validateNameInputAndRenderErrors(): boolean {
 }
 
 // checks if vacancy input has errors and renders necessary error message
-function validateVacancyInputAndRenderErrors(): boolean {
-    let str: string = vacancyInput.value
+function validateVacancyInputAndRenderErrors(inputField: HTMLInputElement, errorNode: HTMLSpanElement): boolean {
+    let str: string = inputField.value
     if (checkNameOrVacancy(str)) {
         if (checkForEmpty(str)) {
-            displayError(vacancyErrorNode, "Must not contain empty string.", "vacancyTimer")
+            displayError(errorNode, "Must not contain empty string.", "vacancyTimer")
             return true;
         } else if (checkForNonEnglishLetters(str)) {
-            displayError(vacancyErrorNode, "Must contain only letters from English alphabet.", "vacancyTimer")
+            displayError(errorNode, "Must contain only letters from English alphabet.", "vacancyTimer")
             return true
         } else if (checkLongLength(str, 15)) {
-            displayError(vacancyErrorNode, "Must not be longer than 15 symbols.", "vacancyTimer")
+            displayError(errorNode, "Must not be longer than 15 symbols.", "vacancyTimer")
             return true
         } else if (checkShortLength(str, 3)) {
-            displayError(vacancyErrorNode, "Must not be shorter than 3 symbols.", "vacancyTimer")
+            displayError(errorNode, "Must not be shorter than 3 symbols.", "vacancyTimer")
             return true
         } else if (checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`))) {
-            displayError(vacancyErrorNode, "Cannot add existing contact", "vacancyTimer")
+            displayError(errorNode, "Cannot add existing contact", "vacancyTimer")
             return true
         }
     }
@@ -416,26 +465,26 @@ function validateVacancyInputAndRenderErrors(): boolean {
 }
 
 // checks if phone input has errors and renders necessary error message
-function validatePhoneInputAndRenderErrors(): boolean {
-    let str: string = phoneInput.value
+function validatePhoneInputAndRenderErrors(inputField: HTMLInputElement, errorNode: HTMLSpanElement): boolean {
+    let str: string = inputField.value
     if (checkPhoneNumber(str)) {
         if (checkForEmpty(str)) {
-            displayError(phoneErrorNode, "Must not contain empty string.", "phoneTimer")
+            displayError(errorNode, "Must not contain empty string.", "phoneTimer")
             return true;
         } else if (checkIfDoesntStartsWithPlus(str)) {
-            displayError(phoneErrorNode, "Must start with plus.", "phoneTimer")
+            displayError(errorNode, "Must start with plus.", "phoneTimer")
             return true;
         } else if (checkForNonNumeric(str)) {
-            displayError(phoneErrorNode, "Must contain only numbers, no spaces and only one plus at the beginning.", "phoneTimer")
+            displayError(errorNode, "Must contain only numbers, no spaces and only one plus at the beginning.", "phoneTimer")
             return true;
         } else if (checkShortLength(str, 5)) {
-            displayError(phoneErrorNode, "Must not be shorter than 5 symbols.", "phoneTimer")
+            displayError(errorNode, "Must not be shorter than 5 symbols.", "phoneTimer")
             return true;
         } else if (checkLongLength(str, 18)) {
-            displayError(phoneErrorNode, "Must not be longer that 18 symbols.", "phoneTimer")
+            displayError(errorNode, "Must not be longer that 18 symbols.", "phoneTimer")
             return true;
         } else if (checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`))) {
-            displayError(phoneErrorNode, "Cannot add existing contact", "phoneTimer")
+            displayError(errorNode, "Cannot add existing contact", "phoneTimer")
             return true;
         }
     }
@@ -443,15 +492,21 @@ function validatePhoneInputAndRenderErrors(): boolean {
 }
 
 // checks if all inputs have errors and renders necessary error messages
-function validateAllInputsAndRenderErrors(): boolean {
-    if (validateNameInputAndRenderErrors()    ||
-        validatePhoneInputAndRenderErrors()   ||
-        validateVacancyInputAndRenderErrors() ||
-        checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`))) 
+// now that i look at it i question why i made it this way 2 months ago
+function validateAllInputsAndRenderErrors(nameInputElement: HTMLInputElement, 
+                                          vacancyInputElement: HTMLInputElement,
+                                          phoneInputElement: HTMLInputElement,
+                                          nameErrorContainer: HTMLSpanElement,
+                                          vacancyErrorContainer: HTMLSpanElement,
+                                          phoneErrorContainer: HTMLSpanElement): boolean {
+    if (validateNameInputAndRenderErrors(nameInputElement, nameErrorContainer)    ||
+        validatePhoneInputAndRenderErrors(phoneInputElement, phoneErrorContainer)   ||
+        validateVacancyInputAndRenderErrors(vacancyInputElement, vacancyErrorContainer) ||
+        checkExistingContact(reduceSpaces(`${reduceSpaces(nameInputElement.value)}${reduceSpaces(vacancyInputElement.value)}${reduceSpaces(phoneInputElement.value)}`))) 
         {
-            validateNameInputAndRenderErrors() 
-            validatePhoneInputAndRenderErrors() 
-            validateVacancyInputAndRenderErrors()
+            validateNameInputAndRenderErrors(nameInputElement, nameErrorContainer) 
+            validatePhoneInputAndRenderErrors(phoneInputElement, phoneErrorContainer) 
+            validateVacancyInputAndRenderErrors(vacancyInputElement, vacancyErrorContainer)
             return true
         }
     return false;
