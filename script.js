@@ -69,6 +69,12 @@ window.addEventListener("load", () => {
 });
 editCloseButton.addEventListener("click", () => {
     editWindow.classList.remove("edit-window_active");
+    editNameErrorNode.classList.remove("error-message_visible");
+    editVacancyErrorNode.classList.remove("error-message_visible");
+    editPhoneErrorNode.classList.remove("error-message_visible");
+    clearTimeout(timers.nameTimer);
+    clearTimeout(timers.vacancyTimer);
+    clearTimeout(timers.phoneTimer);
 });
 editApplyChangesButton.addEventListener("click", () => {
     if (validateAllInputsAndRenderErrors(editInputName, editInputVacancy, editInputPhone, editNameErrorNode, editVacancyErrorNode, editPhoneErrorNode)) {
