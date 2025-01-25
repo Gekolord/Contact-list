@@ -103,14 +103,42 @@ editApplyChangesButton.addEventListener("click", () => {
     if (validateAllInputsAndRenderErrors(editInputName, editInputVacancy, editInputPhone, editNameErrorNode, editVacancyErrorNode, editPhoneErrorNode)) {
         return;
     }
-    
+    deleteItemFromAllContats(
+        allContacts[temporaryContact.name[0].toLowerCase()], 
+        temporaryContact.name,
+        temporaryContact.vacancy,
+        temporaryContact.phone,
+        "name", 
+        "vacancy", 
+        "phone", 
+        `${reduceSpaces(temporaryContact.name)}${reduceSpaces(temporaryContact.vacancy)}${reduceSpaces(temporaryContact.phone)}`
+    );
+    addPersonToContacts(editInputName, editInputVacancy, editInputPhone)
+    const columnToRender: divToRender = document.querySelector(`[data-id="${reduceSpaces(editInputName.value[0].toLowerCase())}"]`)
+    if (columnToRender) {renderColumn(editInputName.value[0].toLowerCase(), columnToRender)}
+    if (searchWindow.classList.contains("seach-window_active")) {
+        if (showallButtonPressed) {
+            renderAllToDiv(searchWindowOutput)
+        } else {
+            searchWindowOutput.innerHTML = ""
+            renderArrToDiv(
+                searchByName(allContacts[searchInput!.value[0].toLowerCase()], searchInput!.value),
+                searchWindowOutput,
+                "search-window__output-data-info",
+                "search-window__output-data-info__remove-button",
+                "search-window__output-data-info__edit-button"
+            )
+        }
+    }
+    editWindow.classList.remove("edit-window_active")
+
 })
 
 addButton.addEventListener("click", function(): void | boolean {
     if (validateAllInputsAndRenderErrors(nameInput, vacancyInput, phoneInput, nameErrorNode, vacancyErrorNode, phoneErrorNode)) {
         return false;
     } else if (!checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput!.value)}${reduceSpaces(vacancyInput!.value)}${reduceSpaces(phoneInput!.value)}`))) {
-        addPersonToContacts()
+        addPersonToContacts(nameInput, vacancyInput, phoneInput)
         console.log(allContacts)
         console.log(existingContacts)
         const toRender: divToRender = document.querySelector(`[data-id="${reduceSpaces(nameInput!.value[0].toLowerCase())}"]`)
@@ -170,7 +198,7 @@ searchWindowCloseButton.addEventListener("click", (): void => {
 })
 
 // adds person to contacts and returns first letter of their name
-function addPersonToContacts(): void | true {
+function addPersonToContacts(nameInput: HTMLInputElement, vacancyInput: HTMLInputElement, phoneInput: HTMLInputElement): void | true {
     const entries: [keyof contact, string][] = [
         ['name', reduceSpaces(nameInput.value.trim())],
         ['vacancy', reduceSpaces(vacancyInput.value.trim())],
@@ -310,7 +338,7 @@ function renderAllColumns(): void {
 
 // render all contacts in one div
 function renderAllToDiv(targetDiv: HTMLDivElement): void {
-
+    targetDiv.innerHTML = ""
     Object.keys(allContacts).forEach((key) => {
         if (allContacts[key].length == 0) {return}
         console.log(key)

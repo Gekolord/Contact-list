@@ -80,13 +80,29 @@ editApplyChangesButton.addEventListener("click", () => {
     if (validateAllInputsAndRenderErrors(editInputName, editInputVacancy, editInputPhone, editNameErrorNode, editVacancyErrorNode, editPhoneErrorNode)) {
         return;
     }
+    deleteItemFromAllContats(allContacts[temporaryContact.name[0].toLowerCase()], temporaryContact.name, temporaryContact.vacancy, temporaryContact.phone, "name", "vacancy", "phone", `${reduceSpaces(temporaryContact.name)}${reduceSpaces(temporaryContact.vacancy)}${reduceSpaces(temporaryContact.phone)}`);
+    addPersonToContacts(editInputName, editInputVacancy, editInputPhone);
+    const columnToRender = document.querySelector(`[data-id="${reduceSpaces(editInputName.value[0].toLowerCase())}"]`);
+    if (columnToRender) {
+        renderColumn(editInputName.value[0].toLowerCase(), columnToRender);
+    }
+    if (searchWindow.classList.contains("seach-window_active")) {
+        if (showallButtonPressed) {
+            renderAllToDiv(searchWindowOutput);
+        }
+        else {
+            searchWindowOutput.innerHTML = "";
+            renderArrToDiv(searchByName(allContacts[searchInput.value[0].toLowerCase()], searchInput.value), searchWindowOutput, "search-window__output-data-info", "search-window__output-data-info__remove-button", "search-window__output-data-info__edit-button");
+        }
+    }
+    editWindow.classList.remove("edit-window_active");
 });
 addButton.addEventListener("click", function () {
     if (validateAllInputsAndRenderErrors(nameInput, vacancyInput, phoneInput, nameErrorNode, vacancyErrorNode, phoneErrorNode)) {
         return false;
     }
     else if (!checkExistingContact(reduceSpaces(`${reduceSpaces(nameInput.value)}${reduceSpaces(vacancyInput.value)}${reduceSpaces(phoneInput.value)}`))) {
-        addPersonToContacts();
+        addPersonToContacts(nameInput, vacancyInput, phoneInput);
         console.log(allContacts);
         console.log(existingContacts);
         const toRender = document.querySelector(`[data-id="${reduceSpaces(nameInput.value[0].toLowerCase())}"]`);
@@ -132,7 +148,7 @@ searchWindowCloseButton.addEventListener("click", () => {
     }
 });
 // adds person to contacts and returns first letter of their name
-function addPersonToContacts() {
+function addPersonToContacts(nameInput, vacancyInput, phoneInput) {
     const entries = [
         ['name', reduceSpaces(nameInput.value.trim())],
         ['vacancy', reduceSpaces(vacancyInput.value.trim())],
@@ -253,6 +269,7 @@ function renderAllColumns() {
 }
 // render all contacts in one div
 function renderAllToDiv(targetDiv) {
+    targetDiv.innerHTML = "";
     Object.keys(allContacts).forEach((key) => {
         if (allContacts[key].length == 0) {
             return;
