@@ -53,6 +53,7 @@ let nameErrorNode = document.querySelector(".error-message__name-error") as HTML
 let vacancyErrorNode = document.querySelector(".error-message__vacancy-error") as HTMLSpanElement
 let phoneErrorNode = document.querySelector(".error-message__phone-error") as HTMLSpanElement
 let searchWindow = document.querySelector(".search-window") as HTMLDivElement
+let searchWindowClosingElements = document.querySelectorAll(".search-window__close-window, .search-window-popup-background") as NodeList
 let searchWindowBackground = document.querySelector(".search-window-popup-background") as HTMLDivElement
 let searchWindowCloseButton = document.querySelector(".search-window__close-window") as HTMLInputElement
 let searchButton = document.querySelector(".form__element-search") as HTMLInputElement
@@ -89,7 +90,18 @@ window.addEventListener("load", (): void => {
     renderAllColumns()
 
 })
-
+searchWindowClosingElements.forEach((closingElement) => {
+    closingElement.addEventListener("click", () => {
+        showallButtonPressed = false
+        if (searchWindow.classList.contains("seach-window_active")) {
+            searchWindowBackground.classList.remove("search-window-popup-background_active")
+            searchWindow.classList.remove("seach-window_active")
+            searchWindowOutput.classList.remove("search-window__output-info-shown")
+            searchWindowOutput.innerHTML = ""
+            searchInput.value = ""
+        }
+    })
+})
 editCloseButton.addEventListener("click", () => {
     editWindow.classList.remove("edit-window_active")
     editNameErrorNode.classList.remove("error-message_visible")
@@ -186,17 +198,6 @@ searchButton!.addEventListener("click", (): void => {
     if (!searchWindow!.classList.contains("seach-window_active")) {
         searchWindow!.classList.add("seach-window_active")
         searchWindowBackground.classList.add("search-window-popup-background_active")
-    }
-})
-
-searchWindowCloseButton.addEventListener("click", (): void => {
-    showallButtonPressed = false
-    if (searchWindow.classList.contains("seach-window_active")) {
-        searchWindowBackground.classList.remove("search-window-popup-background_active")
-        searchWindow.classList.remove("seach-window_active")
-        searchWindowOutput.classList.remove("search-window__output-info-shown")
-        searchWindowOutput.innerHTML = ""
-        searchInput.value = ""
     }
 })
 

@@ -37,6 +37,7 @@ let nameErrorNode = document.querySelector(".error-message__name-error");
 let vacancyErrorNode = document.querySelector(".error-message__vacancy-error");
 let phoneErrorNode = document.querySelector(".error-message__phone-error");
 let searchWindow = document.querySelector(".search-window");
+let searchWindowClosingElements = document.querySelectorAll(".search-window__close-window, .search-window-popup-background");
 let searchWindowBackground = document.querySelector(".search-window-popup-background");
 let searchWindowCloseButton = document.querySelector(".search-window__close-window");
 let searchButton = document.querySelector(".form__element-search");
@@ -67,6 +68,18 @@ let existingContacts = new Set();
 window.addEventListener("load", () => {
     loadFromLocalStorage();
     renderAllColumns();
+});
+searchWindowClosingElements.forEach((closingElement) => {
+    closingElement.addEventListener("click", () => {
+        showallButtonPressed = false;
+        if (searchWindow.classList.contains("seach-window_active")) {
+            searchWindowBackground.classList.remove("search-window-popup-background_active");
+            searchWindow.classList.remove("seach-window_active");
+            searchWindowOutput.classList.remove("search-window__output-info-shown");
+            searchWindowOutput.innerHTML = "";
+            searchInput.value = "";
+        }
+    });
 });
 editCloseButton.addEventListener("click", () => {
     editWindow.classList.remove("edit-window_active");
@@ -138,16 +151,6 @@ searchButton.addEventListener("click", () => {
     if (!searchWindow.classList.contains("seach-window_active")) {
         searchWindow.classList.add("seach-window_active");
         searchWindowBackground.classList.add("search-window-popup-background_active");
-    }
-});
-searchWindowCloseButton.addEventListener("click", () => {
-    showallButtonPressed = false;
-    if (searchWindow.classList.contains("seach-window_active")) {
-        searchWindowBackground.classList.remove("search-window-popup-background_active");
-        searchWindow.classList.remove("seach-window_active");
-        searchWindowOutput.classList.remove("search-window__output-info-shown");
-        searchWindowOutput.innerHTML = "";
-        searchInput.value = "";
     }
 });
 // adds person to contacts and returns first letter of their name
