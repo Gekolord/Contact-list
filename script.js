@@ -44,6 +44,8 @@ let searchButton = document.querySelector(".form__element-search");
 let showAllButton = document.querySelector(".search-window__show-all");
 let searchWindowOutput = document.querySelector(".search-window__output");
 let searchInput = document.querySelector(".search-window__input");
+let editWindowBackground = document.querySelector(".edit-window-popup-background");
+let edithWindowClosingElements = document.querySelectorAll(".edit-window-popup-background, .edit-window__close-window");
 let editWindow = document.querySelector(".edit-window");
 let editCloseButton = document.querySelector(".edit-window__close-window");
 let editApplyChangesButton = document.querySelector(".edit-window__apply-changes-button");
@@ -81,15 +83,27 @@ searchWindowClosingElements.forEach((closingElement) => {
         }
     });
 });
-editCloseButton.addEventListener("click", () => {
-    editWindow.classList.remove("edit-window_active");
-    editNameErrorNode.classList.remove("error-message_visible");
-    editVacancyErrorNode.classList.remove("error-message_visible");
-    editPhoneErrorNode.classList.remove("error-message_visible");
-    clearTimeout(timers.nameTimer);
-    clearTimeout(timers.vacancyTimer);
-    clearTimeout(timers.phoneTimer);
+edithWindowClosingElements.forEach((closingElement) => {
+    closingElement.addEventListener("click", () => {
+        editWindow.classList.remove("edit-window_active");
+        editNameErrorNode.classList.remove("error-message_visible");
+        editVacancyErrorNode.classList.remove("error-message_visible");
+        editPhoneErrorNode.classList.remove("error-message_visible");
+        editWindowBackground.classList.remove("edit-window-popup-background_active");
+        clearTimeout(timers.nameTimer);
+        clearTimeout(timers.vacancyTimer);
+        clearTimeout(timers.phoneTimer);
+    });
 });
+// editCloseButton.addEventListener("click", () => {
+//     editWindow.classList.remove("edit-window_active")
+//     editNameErrorNode.classList.remove("error-message_visible")
+//     editVacancyErrorNode.classList.remove("error-message_visible")
+//     editPhoneErrorNode.classList.remove("error-message_visible")
+//     clearTimeout(timers.nameTimer)
+//     clearTimeout(timers.vacancyTimer)
+//     clearTimeout(timers.phoneTimer)
+// })
 editApplyChangesButton.addEventListener("click", () => {
     if (validateAllInputsAndRenderErrors(editInputName, editInputVacancy, editInputPhone, editNameErrorNode, editVacancyErrorNode, editPhoneErrorNode)) {
         return;
@@ -224,6 +238,7 @@ function renderArrToDiv(arr, targetDiv, contactDivClassName, deleteButtonClassNa
             redactEditInputs(contact);
             redactTemporaryContact(contact);
             editWindow.classList.add("edit-window_active");
+            editWindowBackground.classList.add("edit-window-popup-background_active");
         });
         removeButton.addEventListener('click', () => {
             if (searchInput.value.length !== 0) {
@@ -255,6 +270,7 @@ function renderColumn(char, column) {
             redactEditInputs(obj);
             redactTemporaryContact(obj);
             editWindow.classList.add("edit-window_active");
+            editWindowBackground.classList.add("edit-window-popup-background_active");
         });
         removeButton.addEventListener('click', () => {
             deleteItemFromAllContats(allContacts[char.toLowerCase()], obj.name, obj.vacancy, obj.phone, "name", "vacancy", "phone", `${reduceSpaces(obj.name)}${reduceSpaces(obj.vacancy)}${reduceSpaces(obj.phone)}`);

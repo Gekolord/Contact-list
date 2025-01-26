@@ -60,6 +60,8 @@ let searchButton = document.querySelector(".form__element-search") as HTMLInputE
 let showAllButton = document.querySelector(".search-window__show-all") as HTMLInputElement
 let searchWindowOutput = document.querySelector(".search-window__output") as HTMLDivElement
 let searchInput = document.querySelector(".search-window__input") as HTMLInputElement
+let editWindowBackground = document.querySelector(".edit-window-popup-background") as HTMLDivElement
+let edithWindowClosingElements = document.querySelectorAll(".edit-window-popup-background, .edit-window__close-window") as NodeList
 let editWindow = document.querySelector(".edit-window") as HTMLDivElement
 let editCloseButton = document.querySelector(".edit-window__close-window") as HTMLInputElement
 let editApplyChangesButton = document.querySelector(".edit-window__apply-changes-button") as HTMLInputElement
@@ -102,15 +104,27 @@ searchWindowClosingElements.forEach((closingElement) => {
         }
     })
 })
-editCloseButton.addEventListener("click", () => {
-    editWindow.classList.remove("edit-window_active")
-    editNameErrorNode.classList.remove("error-message_visible")
-    editVacancyErrorNode.classList.remove("error-message_visible")
-    editPhoneErrorNode.classList.remove("error-message_visible")
-    clearTimeout(timers.nameTimer)
-    clearTimeout(timers.vacancyTimer)
-    clearTimeout(timers.phoneTimer)
+edithWindowClosingElements.forEach((closingElement) => {
+    closingElement.addEventListener("click", () => {
+        editWindow.classList.remove("edit-window_active")
+        editNameErrorNode.classList.remove("error-message_visible")
+        editVacancyErrorNode.classList.remove("error-message_visible")
+        editPhoneErrorNode.classList.remove("error-message_visible")
+        editWindowBackground.classList.remove("edit-window-popup-background_active")
+        clearTimeout(timers.nameTimer)
+        clearTimeout(timers.vacancyTimer)
+        clearTimeout(timers.phoneTimer)
+    })
 })
+// editCloseButton.addEventListener("click", () => {
+//     editWindow.classList.remove("edit-window_active")
+//     editNameErrorNode.classList.remove("error-message_visible")
+//     editVacancyErrorNode.classList.remove("error-message_visible")
+//     editPhoneErrorNode.classList.remove("error-message_visible")
+//     clearTimeout(timers.nameTimer)
+//     clearTimeout(timers.vacancyTimer)
+//     clearTimeout(timers.phoneTimer)
+// })
 
 editApplyChangesButton.addEventListener("click", () => {
     if (validateAllInputsAndRenderErrors(editInputName, editInputVacancy, editInputPhone, editNameErrorNode, editVacancyErrorNode, editPhoneErrorNode)) {
@@ -285,6 +299,7 @@ function renderArrToDiv(
             redactEditInputs(contact);
             redactTemporaryContact(contact)
             editWindow.classList.add("edit-window_active")
+            editWindowBackground.classList.add("edit-window-popup-background_active")
         })
         removeButton.addEventListener('click', (): void => {
             if (searchInput.value.length !== 0) {
@@ -314,11 +329,12 @@ function renderColumn(char: string, column: HTMLDivElement): void {
     allContacts[char.toLowerCase()].forEach((obj) => {
         const newDiv: HTMLDivElement = createDiv("column__element-data-info");
         const removeButton: HTMLButtonElement = renderButton("column__element__remove-button", '\u2716')
-         const editButton: HTMLButtonElement = renderButton("column__element__edit-button", '\u270E')
+        const editButton: HTMLButtonElement = renderButton("column__element__edit-button", '\u270E')
         editButton.addEventListener("click", (): void => {
             redactEditInputs(obj);
             redactTemporaryContact(obj)
             editWindow.classList.add("edit-window_active")
+            editWindowBackground.classList.add("edit-window-popup-background_active")
 
         })
         removeButton.addEventListener('click', (): void => {
