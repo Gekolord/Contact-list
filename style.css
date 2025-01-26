@@ -203,6 +203,7 @@
     height: 70%;
     width: 81%;
     background-color: red;
+    overflow: auto;
 }
 
 .search-window__close-window {
